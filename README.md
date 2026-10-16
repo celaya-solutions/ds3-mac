@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — The Next Bonfire
-Version:     v1.0.0
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      c19f91748cb438e1660531e84fb6bd361d66ebefdaba278b826d6aebb4763bd0
+SHA256:      b56944f516af993f4817de4fc68c7a84dfe604f6e0f888a0db9b693b5f7f89e8
 Chain:       solana-mainnet
-Tx:          2X4gZBo9in2hSk8sHifo5GpTw5XwwvZ2HzmPyHPenNYo4JirQucywwxzu1Z5vSDrxWSf9EhspahTrmpX1x1sRZgD
+Tx:          5Y6774nLbrrTFQpcMSQTsWWAfYSoAzdUjW7fLBQBU8rK62LLFEkLg69ytPRWMwRnwawHokWNojmz5zXB5vXKHxH9
 License:     All Rights Reserved / Celaya Solutions
 ```
 
@@ -18,7 +18,7 @@ A follow-up to Celaya Solutions’ Bloodborne-on-Mac work. This time, the road l
 
 Before you touch the code, learn what you are carrying: your own game, a backup you can trust, and evidence that tells you what actually worked. Pick a path. You can change it at any bonfire.
 
-> **Current state:** this branch prepares the public learning guide. It includes an offline disc-backup walkthrough. The DS3 adapter and launcher are being developed separately and are not included here yet. This guide does not establish that Dark Souls III is playable on Mac.
+> **Current state:** an early compatibility experiment, with an import adapter, launcher, six local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
 
 ## Choose your path
 
@@ -63,7 +63,17 @@ The [quest](docs/quest.md) teaches why each check matters.
 
 ## Beyond the bonfire
 
-The next research stage is understanding how a runtime resolves the game’s imports, then testing each startup milestone. It needs code and reproducible results before we can publish a working launch recipe. There is no verified DS3 launch command in this documentation branch.
+Continue with the [runtime guide](docs/runtime.md) after your backup is checked. You need a compatible, separately installed **bbport 0.4-v1 runtime**, your own **DS3 CUSA03388 v1.00** files, and your own supported **Bloodborne reference executable**. This repo does not install or bundle those inputs.
+
+To work on the adapter without game files:
+
+```sh
+git clone https://github.com/celaya-solutions/ds3-mac.git
+cd ds3-mac
+python3 -m unittest -v
+```
+
+Use the **Fork** button first if you want to contribute from your own GitHub copy. The [quest](docs/quest.md#vii--read-the-runes) gives you a question before explaining the adapter.
 
 Want to help? Start with [contributing](CONTRIBUTING.md). A small, well-supported correction is a useful first contribution.
 
@@ -73,4 +83,4 @@ DARK SOULS III and Bloodborne belong to their respective rights holders. This is
 
 The backup workflow builds on [CSSFontFace/Lapse](https://github.com/ntfargo/CSSFontFace-Exploit), [GoldHEN](https://github.com/GoldHEN/GoldHEN), and [ftpdump](https://github.com/hippie68/ftpdump). Those projects retain their own licenses and credits.
 
-**License:** no open-source license has been selected for this preparation branch. Do not assume that visibility alone grants reuse rights. License selection is a release gate.
+**License:** original Python code is MIT-licensed. The README and tutorials are licensed under CC BY 4.0. Keep attribution to Celaya Solutions; see [license terms](LICENSE.md). Third-party games, runtimes, and tools are not covered by these grants.

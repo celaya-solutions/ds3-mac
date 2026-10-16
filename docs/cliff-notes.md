@@ -1,12 +1,12 @@
 ```text
 Document:    The Homeward Bone — Dark Souls III Mac Cliff Notes
-Version:     v1.0.0
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      5e666b0d806699b12e0a2cb95c1b384a071e0262074b2982c806990fd4cbd2ac
+SHA256:      66a0885bcc096b2461dbee98128a26a0ea11fa8de6de260e9786424e29b52da1
 Chain:       solana-mainnet
-Tx:          4AwdEPHqfnCLUexidmbz2ckDaVcyUYcFzn7gpSMJRjx7PVL1RWbS6EzQPUAZjzk8LBDMueq2rPxtRQ2SD6JYd2o5
+Tx:          45Jngv9Schrd6K5obxeqwdSBFji71RMpMrEaEKxfrYkdUbTUmuAdKr6RSYjMBfELkUTWrczM7MxDQ5GJu7dq5Mev
 License:     All Rights Reserved / Celaya Solutions
 ```
 
@@ -14,7 +14,7 @@ License:     All Rights Reserved / Celaya Solutions
 
 [Choose another path](../README.md#choose-your-path) · [Companion prompt](companion.md)
 
-**Scope:** offline disc backup. DS3-on-Mac playability is not established by this guide, and the adapter is not included in this branch.
+**Scope:** backup first, then an optional runtime experiment. A backup alone does not prove playability. The [runtime guide](runtime.md) lists the exact inputs and the limits of the recorded early gameplay test.
 
 ## Before you start
 
@@ -36,3 +36,7 @@ Need commands or recovery details? Use the [regular tutorial](regular.md). These
 ## The prompt
 
 Copy the [companion prompt](companion.md) and set `MODE: cliff-notes`. It asks only missing setup questions, gives a compact route, and keeps device checks visible.
+
+## Code route
+
+Run `python3 -m unittest -v` for the six adapter tests; no game files are needed. To try the game, read [runtime requirements](runtime.md) and use explicit paths to your own DS3 files, supported Bloodborne reference, and bbport installation. Record startup, rendering, input, and save behavior separately. Do not treat an exit code or frame counter as proof of a complete gameplay test.

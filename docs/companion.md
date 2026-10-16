@@ -1,6 +1,6 @@
 ```text
 Document:    Summon a Companion — Dark Souls III Learning Prompt
-Version:     v1.0.0
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16

@@ -1,12 +1,12 @@
 ```text
 Document:    The Pilgrimage — A Dark Souls III Mac Learning Quest
-Version:     v1.0.0
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      baf0e408821dea987473fb73a727c08b5b5effcacf837c9c04744f62c86bd22f
+SHA256:      134ea65769ef12bdcfe6ed3103f078ab60687e29e1aa422e07022c5047b29afb
 Chain:       solana-mainnet
-Tx:          2oK14NkdaFLFucHMwVGZMQMHg9h4exKMYz5DBQdkbKXQQqCeMUN9jReQazi2UQPd5fAJPnocNB4kKqnQah8mZTbL
+Tx:          mYegVWnbjCP6qVsZFuT1fHbjj9oMkrAjx9YuqTFjnuFXLaJMdb7UwLJtHpHj5EwtoWpuMurWbC5npoDB32ftRhS
 License:     All Rights Reserved / Celaya Solutions
 ```
 
@@ -152,10 +152,32 @@ Think about which program has actually executed during this lesson.
 <details>
 <summary>Answer · leave the claim where the evidence ends</summary>
 
-It shows that you have checked local input files. It does not show that a Mac runtime can load the program, resolve its imports, render a scene, or support a playable session. Each needs its own observation. The adapter is not included in this branch, so this quest makes no launch or frame-rate promise.
+It shows that you have checked local input files. It does not show that a Mac runtime can load the program, resolve its imports, render a scene, or support a playable session. Each needs its own observation. The recorded runtime test is a separate observation; see [its conditions and limits](runtime.md). Your backup alone cannot reproduce that claim.
 
 </details>
 
 **Your first contribution:** explain one gate in your own words, or report a confusing step with the expected and observed result. Read [contributing](../CONTRIBUTING.md) before sharing logs.
 
 *Rest here. Keep your notes. The next traveler should find a clearer road.*
+
+## VII · Read the runes
+
+**Before you act:** you can run `python3 -m unittest -v` without a console or game files. Runtime tests require the inputs listed in the [runtime guide](runtime.md). Do not download someone else’s game files to complete this lesson.
+
+**Question:** two game executables use the same short library ID. Why might binding their imports by that ID alone call the wrong function?
+
+<details>
+<summary>Hint · names have a home</summary>
+
+Ask whether the short ID belongs to the whole platform or to one executable’s own table. Look at the collision test in `test_import_adapter.py` when you are ready to inspect an example.
+
+</details>
+
+<details>
+<summary>Answer · translate the identity, not the letter</summary>
+
+The IDs are local to each executable. The adapter reads the library and module identities, including their versions, then maps them to the reference executable’s IDs. An unrelated library must not inherit a matching short ID. Read `canonical_name` in `import_adapter.py`, then the collision and version-mismatch tests. Predict their results before running them.
+
+</details>
+
+**Bonfire:** explain why names *and versions* matter. Then run the six tests and read the test that checks that bytes outside import-name slots stay unchanged. For a live experiment, continue to the [runtime guide](runtime.md) and record your own observations.

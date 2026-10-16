@@ -1,12 +1,12 @@
 ```text
 Document:    Back Up a PS4 Game Disc to a Mac While Staying Offline
-Version:     v1.1.0
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      8bb7fee502fa7c2e810da3a5990a949239741179b49f3bd30abbae63c01a69b5
+SHA256:      f2c486e80c1d14129d95d1b28b38e6ea7fa62aea63479715361fd692267fa310
 Chain:       solana-mainnet
-Tx:          52HSiixhgDfzHpkhXBBp2QLRWgYsnGSjhdNh9GG6uW66pwycEUctLojj98JBAYKMe2t7eFq1bDeNFQiThm5g4Njk
+Tx:          3mT3Ve2mmVkD24ZCuTiPDtJyRzDruP9FYGUbWnhT5MrPR3LCVqQNC98z9DY3XZ96Jo3NPpauwA64nho8xbnNe65y
 License:     All Rights Reserved / Celaya Solutions
 ```
 
@@ -237,3 +237,7 @@ version, and whether it is safe for me to close the game.
 - [ftpdump and its instructions](https://github.com/hippie68/ftpdump)
 
 These projects can change. Check their current instructions and your saved setup before using a new release.
+
+## Next: understand and test the adapter
+
+Your backup is an input, not a guarantee that a runtime supports it. Continue with the [runtime guide](runtime.md) for the exact requirements, launch command, code explanation, and recorded test limits. The [quest’s code lesson](quest.md#vii--read-the-runes) asks you to predict the import problem before revealing the explanation.

@@ -1,37 +1,37 @@
 ```text
-Document:    Dark Souls III Public Preparation — Agent Notes
+Document:    Dark Souls III on Mac — Agent Notes
 Version:     v1.0.1
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      8be976d2faf478ebb29cf9b2be0f9b6929920d0c9d3094dda329eda54cdca8c2
+SHA256:      ea8f99b071b1c58f02652888e71a4c20e26ae174d6bbda9096b623e387b3ed0d
 Chain:       solana-mainnet
-Tx:          4ZXoatxDpTCXJCH5ypa9RSggRS6HpmRw81akAmkYL1zbJZea6nvXK4iQFT4M3mHNeF198U5AioXXwQk2Rycnr1pA
+Tx:          46KdStPKcFXZHhmjTp5z4cLzf2u21SMDDiCikhuj857xgjsYaCLmrZfwp5sgtTvVup28xVZZmYwiVJ35k9Dah2CT
 License:     All Rights Reserved / Celaya Solutions
 ```
 
-# Scope and working rules
+# Working rules
 
-Use isolated worktrees. Commit completed work. Do not merge without a direct request. Never use GitHub Actions for checks, builds, releases, or deployment.
+Use isolated worktrees. Commit completed work; merge or publish only when directly requested. Never use GitHub Actions. Use graft before locating or understanding code; indexing is local and regenerable.
 
-Use graft first when locating or understanding code. This branch currently contains documentation only. Keep private game files, keys, saves, backups, and raw runtime logs out of Git. Do not change PS4 firmware or connect it to the internet. Do not touch excluded drives.
+Keep games, runtimes, generated images, keys, saves, raw logs, and private backups out of Git. Preserve the Bloodborne project and its dirty worktrees. Do not inspect or modify excluded drives. Keep the PS4 offline and its firmware unchanged.
 
-Keep three paths: regular tutorial, quest, and cliff notes. Quest hints and answers use closed HTML details blocks. Safety, prerequisites, device steps, and failed-check handling stay visible. All paths use the same factual workflow. Prompts ask missing setup questions and wait for required device observations.
+Keep the regular, quest, and cliff-notes learning paths consistent. Quest hints and answers use closed details blocks. Prerequisites, safety, and recovery remain visible. Companion prompts ask missing questions and wait for required console observations.
 
-Use the standard header for documents. Anchor changed header-bearing files before committing; stamp and record the reason if anchoring fails. Do not fabricate transactions or hashes.
+Use the standard document header. Anchor changed header-bearing files before commits; stamp and record the reason if anchoring fails. Never invent hashes or transactions. Original Python code is MIT; original Markdown documentation is CC BY 4.0. Preserve third-party credits and terms.
 
-## Public release gates
+## Code and evidence
 
-- Confirm the intended scope with the owner: full backup-to-code journey or adapter-focused entry point. The neighboring adapter worktree is unfinished and must not be copied or published without coordination.
-- Select an explicit code and documentation license. Current document headers retain the required rights notice; no broad reuse grant has been chosen.
-- Confirm the Bloodborne project link and any public launch claim. The owner reported 1.7 million views; that figure is not independently verified and has not been added to public copy.
-- Confirm the GitHub destination and publishing authorization. No remote was configured at preparation start; do not assume an inaccessible repository name is available.
-- Review all intended code, dependency licenses, binaries, history, and runtime claims before publishing a combined repository. Documentation checks alone do not validate the adapter.
+The adapter targets CUSA03388 01.00 and bbport 0.4-v1. Library IDs are executable-local: match library/module names and versions. Do not strip IDs, bind unrelated libraries, or apply Bloodborne address patches to DS3.
 
-## Handoff
+Run `python3 -m unittest -v` and `git diff --check` locally. The six tests cover import identity, collisions, versions, unknown IDs, and preservation of image bytes outside import names.
 
-The regular guide was carried from the committed offline-backup-guide branch. Its recorded results are inherited observations, not a new device run. The public-prep branch leaves main and neighboring worktrees untouched.
+The original attended test reached Cemetery of Ash with walking and sword input near 30 FPS. Private evidence lives in the test worktree’s ignored runtime folders; it is not bundled. Publishing documentation does not repeat that run. Full-game coverage, sustained combat performance, controller input, and listened-to audio remain unverified. The GPU cache still uses the shared shadPS4 root under the DS3 title ID. Test apps share a bundle ID; use their full path when controlling multiple copies. Copy prior test saves with `--save-from`; do not modify the only save.
 
-## Completion note
+## Release notes
 
-2026-10-16: Prepared the README, regular guide, six-stage quest, cliff notes, companion prompt, and contribution notes. Local link, HTML disclosure, private-data pattern, whitespace, and document-hash checks passed; no device or runtime test was performed.
+2026-10-16: The owner approved merging and publishing main to celaya-solutions/ds3-mac and requested a profile pin. Combined the completed adapter with three learning paths, added explicit runtime requirements and licenses, and checked the six local tests. The reported 1.7 million Bloodborne views is an owner-supplied launch figure, not an independently measured project result.
+
+No Bloodborne project URL has been confirmed; add it when supplied. Keep future runtime claims tied to observed test conditions.
+
+2026-10-16 completion: Integrated the adapter and public guides; all six tests, document links, closed disclosures, and header hashes passed local checks. Profile pinning could not run because the browser connection list was empty; use GitHub’s Customize your pins control.

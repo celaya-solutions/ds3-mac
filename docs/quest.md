@@ -1,13 +1,13 @@
 ```text
 Document:    The Pilgrimage — A Dark Souls III Mac Learning Quest
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
 SHA256:      134ea65769ef12bdcfe6ed3103f078ab60687e29e1aa422e07022c5047b29afb
 Chain:       solana-mainnet
 Tx:          mYegVWnbjCP6qVsZFuT1fHbjj9oMkrAjx9YuqTFjnuFXLaJMdb7UwLJtHpHj5EwtoWpuMurWbC5npoDB32ftRhS
-License:     All Rights Reserved / Celaya Solutions
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # The Pilgrimage

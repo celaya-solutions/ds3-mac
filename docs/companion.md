@@ -1,13 +1,13 @@
 ```text
 Document:    Summon a Companion — Dark Souls III Learning Prompt
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
 SHA256:      a571c68aecd9e3f20f7107b32d349fe4dc17696debb25d2c9aebebf89bb33683
 Chain:       solana-mainnet
 Tx:          4q7UyYb9pYHiEVxh4DyUKZkDXL7SyWfPxzU9xfDLTHbpndF99f6eo2PHjaWAmNt1vorkALviuYmDXPYcLVg5nxvY
-License:     All Rights Reserved / Celaya Solutions
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # Summon a companion

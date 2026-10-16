@@ -1,13 +1,13 @@
 ```text
 Document:    Dark Souls III on Mac — The Next Bonfire
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      b56944f516af993f4817de4fc68c7a84dfe604f6e0f888a0db9b693b5f7f89e8
+SHA256:      2864b65abcb9b2432d5d87dea0864d0339c6992ee9432bff878db3e73b47f0f1
 Chain:       solana-mainnet
-Tx:          5Y6774nLbrrTFQpcMSQTsWWAfYSoAzdUjW7fLBQBU8rK62LLFEkLg69ytPRWMwRnwawHokWNojmz5zXB5vXKHxH9
-License:     All Rights Reserved / Celaya Solutions
+Tx:          5NmGmjFNm21oDmxsYTm1MtASWrkea9KE7FrBvmxjpvoNP1bd1s7VBxqRuBkQDREJSwV3a1mNmte9iw8UfEihVdQ4
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # DARK SOULS III · MAC
@@ -83,4 +83,4 @@ DARK SOULS III and Bloodborne belong to their respective rights holders. This is
 
 The backup workflow builds on [CSSFontFace/Lapse](https://github.com/ntfargo/CSSFontFace-Exploit), [GoldHEN](https://github.com/GoldHEN/GoldHEN), and [ftpdump](https://github.com/hippie68/ftpdump). Those projects retain their own licenses and credits.
 
-**License:** original Python code is MIT-licensed. The README and tutorials are licensed under CC BY 4.0. Keep attribution to Celaya Solutions; see [license terms](LICENSE.md). Third-party games, runtimes, and tools are not covered by these grants.
+**License:** all original code, tests, guides, and prompts are open source under the [MIT License](LICENSE.md). Use, change, share, or sell them; keep the copyright and license notice crediting **CSR (Celaya Solutions)**. Third-party games, runtimes, and tools retain their own licenses.

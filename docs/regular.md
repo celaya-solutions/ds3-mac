@@ -1,13 +1,13 @@
 ```text
 Document:    Back Up a PS4 Game Disc to a Mac While Staying Offline
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
 SHA256:      f2c486e80c1d14129d95d1b28b38e6ea7fa62aea63479715361fd692267fa310
 Chain:       solana-mainnet
 Tx:          3mT3Ve2mmVkD24ZCuTiPDtJyRzDruP9FYGUbWnhT5MrPR3LCVqQNC98z9DY3XZ96Jo3NPpauwA64nho8xbnNe65y
-License:     All Rights Reserved / Celaya Solutions
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # Back up your PS4 game disc to a Mac

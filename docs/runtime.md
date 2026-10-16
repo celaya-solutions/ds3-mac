@@ -1,13 +1,13 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
 SHA256:      675db45d04cbd1fd4300cd1f77390db5ced04386fe5fc1aaca92ca6254207a97
 Chain:       solana-mainnet
 Tx:          VAEf5y4vjmQnBmdzM2zzTh9CiCwpFAoUT6YRMrJHcCVXZ2nronqPsAteps58mMnEEeDV6DB7d31SsDC5s4wV47f
-License:     All Rights Reserved / Celaya Solutions
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # Dark Souls III compatibility test

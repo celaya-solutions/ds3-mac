@@ -1,13 +1,13 @@
 ```text
 Document:    Dark Souls III on Mac — Agent Notes
-Version:     v1.0.1
+Version:     v1.1.1
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      ea8f99b071b1c58f02652888e71a4c20e26ae174d6bbda9096b623e387b3ed0d
+SHA256:      1a0ba810619de234829df187c649acd88663b69140cdf639b41a4f421ad3203e
 Chain:       solana-mainnet
-Tx:          46KdStPKcFXZHhmjTp5z4cLzf2u21SMDDiCikhuj857xgjsYaCLmrZfwp5sgtTvVup28xVZZmYwiVJ35k9Dah2CT
-License:     All Rights Reserved / Celaya Solutions
+Tx:          5ZMWk8W59UF4oyeT3QHLzBRKyAZDRdeBoY9LjxCwjgF8vps8J8531hAGATpmDWNb5fxA8bqZM8eJi22VqFBWuTCy
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # Working rules
@@ -18,7 +18,7 @@ Keep games, runtimes, generated images, keys, saves, raw logs, and private backu
 
 Keep the regular, quest, and cliff-notes learning paths consistent. Quest hints and answers use closed details blocks. Prerequisites, safety, and recovery remain visible. Companion prompts ask missing questions and wait for required console observations.
 
-Use the standard document header. Anchor changed header-bearing files before commits; stamp and record the reason if anchoring fails. Never invent hashes or transactions. Original Python code is MIT; original Markdown documentation is CC BY 4.0. Preserve third-party credits and terms.
+Use the standard document header. Anchor changed header-bearing files before commits; stamp and record the reason if anchoring fails. Never invent hashes or transactions. All original code, tests, documentation, and prompts use MIT, with copyright attribution to CSR (Celaya Solutions). Use `License:     MIT / CSR (Celaya Solutions)` in document headers; the owner explicitly replaced the prior rights-reserved and split-license terms. Preserve third-party credits and terms.
 
 ## Code and evidence
 
@@ -35,3 +35,5 @@ The original attended test reached Cemetery of Ash with walking and sword input 
 No Bloodborne project URL has been confirmed; add it when supplied. Keep future runtime claims tied to observed test conditions.
 
 2026-10-16 completion: Integrated the adapter and public guides; all six tests, document links, closed disclosures, and header hashes passed local checks. Profile pinning could not run because the browser connection list was empty; use GitHub’s Customize your pins control.
+
+2026-10-16: Unified all original code, docs, and prompts under standard MIT with CSR (Celaya Solutions) copyright credit. Updated every document license header and removed split-license terms; all six tests and license-consistency checks passed.

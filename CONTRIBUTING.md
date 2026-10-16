@@ -1,13 +1,13 @@
 ```text
 Document:    Contributing to Dark Souls III on Mac
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
-SHA256:      0c1cf11568cc250bf4d412ce8d680aacbb6f642e784225d914fcf022e6d390c8
+SHA256:      6827ca86967f49ce1053fad0d7bd2b128db44ec1fa7737ff4c59b7071ebf8f27
 Chain:       solana-mainnet
-Tx:          5Xw9bSXHsaygNr9ywgG3xYUgRnzDxYFmk2HF25fY2RYRNGms7jc7wj2vJ37LidoetrAyJSoSLiH48PYin8uZNLLA
-License:     All Rights Reserved / Celaya Solutions
+Tx:          sV7f9j5QvS16o19MnpRobT8EwWEt5y1Kz28Q6KsQX6S9ne6VDQKc6tN43C1WB2bNb1utqv2jjKBmVQb7AfBVFvL
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # Leave a clearer road
@@ -38,4 +38,4 @@ Keep the standard document header. Update its date and version when needed. Use 
 
 ## License
 
-Original Python code uses MIT; project documentation uses CC BY 4.0. Contributions use the same terms as the material they change. See [license terms](LICENSE.md). Only submit work you have the right to share.
+All original code and documentation use the [MIT License](LICENSE.md). Contributions use the same terms. Keep the copyright and license notice crediting CSR (Celaya Solutions). Only submit work you have the right to share.

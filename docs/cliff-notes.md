@@ -1,13 +1,13 @@
 ```text
 Document:    The Homeward Bone — Dark Souls III Mac Cliff Notes
-Version:     v1.2.0
+Version:     v1.3.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-16
 SHA256:      66a0885bcc096b2461dbee98128a26a0ea11fa8de6de260e9786424e29b52da1
 Chain:       solana-mainnet
 Tx:          45Jngv9Schrd6K5obxeqwdSBFji71RMpMrEaEKxfrYkdUbTUmuAdKr6RSYjMBfELkUTWrczM7MxDQ5GJu7dq5Mev
-License:     All Rights Reserved / Celaya Solutions
+License:     MIT / CSR (Celaya Solutions)
 ```
 
 # The Homeward Bone

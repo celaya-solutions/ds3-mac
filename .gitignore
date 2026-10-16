@@ -1,0 +1,25 @@
+# Private local artifacts
+.DS_Store
+.env
+.env.*
+!.env.example
+runtime/
+backups/
+game-files/
+saves/
+logs/
+*.log
+*.pkg
+*.pup
+*.iso
+*.elf
+*.self
+*.sprx
+*.bin
+keystone
+*.pem
+*.key
+__pycache__/
+*.py[cod]
+.venv/
+graft/

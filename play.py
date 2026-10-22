@@ -127,6 +127,7 @@ def main():
               'runtime_layout': 'source' if args.bbport_src else 'packaged',
               'timeout_seconds': args.timeout, 'gameplay_verified': False,
               'probe_sha256': hashlib.sha256(probe.read_bytes()).hexdigest(),
+              'app_probe_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
               'gpu_sha256': hashlib.sha256((probe.parent / 'gpu/libbbgpu.dylib').read_bytes()).hexdigest()}
     duration = f'{args.timeout}-second test' if args.timeout else 'session until you quit'
     print(f'Remapped {len(changes)} imports. Starting {duration}. Log: {out / "run.log"}', flush=True)

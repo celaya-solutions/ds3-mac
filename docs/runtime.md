@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.5.0
+Version:     v1.5.1
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      dee7b20c383b8d9f9c51e72784a33ec2de0f229677c75274d4cad5ec9f01f4eb
+SHA256:      fbf09d318eccd4b86ddd0200eb9cc540ff3a360ef0a3205d680b0cbd29946d2c
 Chain:       solana-mainnet
-Tx:          5LxG6afRvgoDixtPcZ2nQdvqdndmqkw3VnDaJEtKisXfxNrt2KmFbzhYhGKLewapyz9oFpvob9U82QFxvBLj8N34
+Tx:          2fnHpf2BNCKBpX7iCSZRgFvGokir25gECuk8J1H24s8EAwzBbGAznCWX1ubCxNbwhhwCbxxa4iaAFi16TECFRqsw
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -65,7 +65,9 @@ it to play until you quit. Progress stays in that session's `user` folder.
 Each launch first copies the saves and settings into `backups/<timestamp>`;
 backup failure stops launch. Logs get separate `out/play-<timestamp>.log` files.
 Duplicate launches are rejected, and changed probe/GPU binaries require a fresh
-`play.py` run with `--save-from`. Keep the prepared session and engine in place.
+`play.py` run with `--save-from`. Older reports lack the signed app's hash;
+prepare a fresh session with the current launcher before using `restart.py`.
+Keep the prepared session and engine in place.
 
 Fresh sessions default to native 1080p, upscaling off, object motion off, and
 live resolution changes off. Frame diagnostics are disabled to avoid their
@@ -112,7 +114,8 @@ draw; using it does not prove DS3 needs it or that a scene renders correctly.
 
 The launcher copies only the probe into its separate app and links to that
 build's GPU library and dependencies. It records the probe and GPU hashes in
-`out/result.json` when the session ends. It does not modify the source build,
+`out/result.json` when the session ends, including a separate hash for the
+signed app's probe. It does not modify the source build,
 the earlier save, or Bloodborne settings. Bloodborne's executable-address,
 resolution, and frame-rate patches are not compatible evidence for DS3 and
 are never passed to this launcher.

@@ -30,6 +30,8 @@ def main():
             parser.error('Unknown runtime layout')
         if args.fps_size > 1 and report['runtime_layout'] != 'source':
             parser.error('--fps-size above 1 needs the source runtime with the optional overlay patch')
+        if 'app_probe_sha256' not in report:
+            parser.error('Older session report; prepare a fresh session with play.py --save-from first')
         contents = data / 'DS3 Test.app/Contents'
         binary = contents / 'MacOS/bb-probe'
         libraries = (contents / 'lib').resolve()
@@ -42,7 +44,7 @@ def main():
                 parser.error(f'Missing input: {path}')
         if not root.is_dir() or not (data / 'user/savedata/1/CUSA03388/DS30000').is_dir():
             parser.error('Missing runtime directory or DS3 save; prepare a session with play.py first')
-        for path, key in ((binary, 'probe_sha256'), (gpu, 'gpu_sha256')):
+        for path, key in ((binary, 'app_probe_sha256'), (gpu, 'gpu_sha256')):
             if hashlib.sha256(path.read_bytes()).hexdigest() != report[key]:
                 parser.error('Runtime changed; prepare a fresh session with play.py --save-from first')
         with (data / '.play.lock').open('a') as lock:

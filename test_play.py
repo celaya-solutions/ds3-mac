@@ -1,4 +1,5 @@
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -55,6 +56,8 @@ class LauncherTests(unittest.TestCase):
             return SimpleNamespace(returncode=1)
         if command[0] == 'codesign':
             self.signs.append(command)
+            binary = Path(command[-1]) / 'Contents/MacOS/bb-probe'
+            binary.write_bytes(binary.read_bytes() + b'-signed')
         if command[0].endswith('/MacOS/bb-probe'):
             self.launches.append((command, kwargs))
             kwargs['stdout'].write('Entering original x86-64 code\n')
@@ -93,7 +96,7 @@ class LauncherTests(unittest.TestCase):
                 self.assertEqual(command[-2:], ['--timeout', '120'])
                 self.assertEqual(kwargs['timeout'], 135)
                 binary = Path(command[0])
-                self.assertEqual(binary.read_bytes(), probe.read_bytes())
+                self.assertEqual(binary.read_bytes(), probe.read_bytes() + b'-signed')
                 self.assertEqual((binary.parent / 'gpu').resolve(), probe.parent / 'gpu')
                 self.assertEqual((binary.parents[1] / 'lib').resolve(), libraries)
                 self.assertNotIn('--deep', self.signs[-1])
@@ -103,6 +106,8 @@ class LauncherTests(unittest.TestCase):
                 self.assertEqual(self.save_file.read_bytes(), b'original')
                 report = json.loads((self.data / 'out/result.json').read_text())
                 self.assertEqual(report['runtime_layout'], 'source' if source else 'packaged')
+                self.assertEqual(report['app_probe_sha256'], hashlib.sha256(binary.read_bytes()).hexdigest())
+                self.assertNotEqual(report['probe_sha256'], report['app_probe_sha256'])
                 self.assertEqual(len(report['gpu_sha256']), 64)
                 self.assertTrue(report['entered_game'])
                 self.assertFalse(report['gameplay_verified'])

@@ -40,7 +40,7 @@ print('test runtime')
         self.report.write_text(json.dumps({
             'title_id': 'CUSA03388', 'version': '01.00', 'runtime_layout': 'source',
             'game': str(self.data / 'game'), 'bbport': str(self.data),
-            'probe_sha256': hashlib.sha256(self.binary.read_bytes()).hexdigest(),
+            'app_probe_sha256': hashlib.sha256(self.binary.read_bytes()).hexdigest(),
             'gpu_sha256': hashlib.sha256(self.gpu.read_bytes()).hexdigest(),
         }))
         self.report_before = self.report.read_bytes()
@@ -88,6 +88,10 @@ print('test runtime')
         self.assertFalse((self.data / 'backups').exists())
 
     def test_invalid_report_fails_without_starting_runtime(self):
+        older_report = json.loads(self.report_before)
+        del older_report['app_probe_sha256']
+        self.report.write_text(json.dumps(older_report))
+        self.assertIn('Older session report', self.run_restart().stderr)
         for report in ('invalid json', '{}', '{"title_id":"CUSA00900","version":"01.09"}'):
             self.report.write_text(report)
             self.assertNotEqual(self.run_restart().returncode, 0)

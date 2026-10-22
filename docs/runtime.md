@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.8.0
+Version:     v1.9.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      11c8c4bab8574d0774ad310735277735446bdcd6c6f4e9590267ff702e470d2f
+SHA256:      6468ac907f9852098e08957d74369821e1cfcee80261f684b4ba41d46e153307
 Chain:       solana-mainnet
-Tx:          4xnCYbjbY8z94EzmaBbcSgQDYVgmeDrAVTqXhfcH653aeMTfhHwamvzver9WkZr3tJvUwuKtYwqDDD9YnMjQHGAs
+Tx:          42zFDigvAARQ96iTVzaVPBYL7jb2cxXrbBzLGmPEKVt9NnEpax6sao4UBXXKy89Jk7sSrbntWWGK9SUAF89XZziL
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -254,6 +254,26 @@ the GPU read 64 MiB of imported guest memory in 0.41 ms (162.5 GB/s) against
 calls on the guest view did not slow GPU reads of the imported view. This
 clears the way for guest memory in place on Apple silicon (engine plan, Task 2).
 Private output: `runtime/probe-ext/host-import.txt`.
+
+## Guest memory in place — October 21, 2026
+
+Built in the local bbport checkout (patch `guest-in-place-macos.patch` beside
+the other bbport patches in the Bloodborne project): on Apple silicon bbport
+now imports the runtime's shared-memory backing view per 256 MiB chunk with
+host-pointer import, so with `BB_GUEST_IN_PLACE=1` the GPU's arena binds the
+game's own pages and write-fault tracking is off. A startup self-test and the
+`guest-memory-test` target pass on the M5 Max. Launcher smokes with the tuned
+setup: a 30-second run with the flag alone entered the game, imported 17 chunks
+(4,352 MiB), bound 8 MiB of the arena in place, then crashed with a host fault
+in `BufferCache::EnsureResident` reached from bbport's in-place GPU
+command-write path (`WriteDataOnGpu`, `CommandWriteTarget`) on the draw
+recording thread; a 60-second run with `BB_GPU_COMMAND_WRITES=0` added ran to
+its watchdog with no fault. Neither run reached gameplay frames (the menus need
+input), so the write-fault and FPS rows are still to be played:
+`restart.py <session> --tuned --env BB_GUEST_IN_PLACE=1 --env BB_GPU_COMMAND_WRITES=0`,
+then `stats.py`. The flag stays off by default. The crash is in bbport's
+in-place write path, not in the import layer. Private logs:
+`runtime/smoke-guest-in-place*/out/run.log`.
 
 ## Recorded observations — October 16, 2026
 

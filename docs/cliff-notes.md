@@ -1,12 +1,12 @@
 ```text
 Document:    The Homeward Bone — Dark Souls III Mac Cliff Notes
-Version:     v1.3.0
+Version:     v1.3.1
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
-Date:        2026-10-16
-SHA256:      66a0885bcc096b2461dbee98128a26a0ea11fa8de6de260e9786424e29b52da1
+Date:        2026-10-21
+SHA256:      c5c0ab3873744665687b73c710dc46b013d1887644d821ce7f9bb49b78b46a12
 Chain:       solana-mainnet
-Tx:          45Jngv9Schrd6K5obxeqwdSBFji71RMpMrEaEKxfrYkdUbTUmuAdKr6RSYjMBfELkUTWrczM7MxDQ5GJu7dq5Mev
+Tx:          2qWrFyyeqwdQKv9yrAMCpmTDNFo1j6xwKsVrvFeVvWHFYc6BHqXueYziJwdkd2cTJbYtbA7PqNjFiqu5ci8q8LKD
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -39,4 +39,4 @@ Copy the [companion prompt](companion.md) and set `MODE: cliff-notes`. It asks o
 
 ## Code route
 
-Run `python3 -m unittest -v` for the six adapter tests; no game files are needed. To try the game, read [runtime requirements](runtime.md) and use explicit paths to your own DS3 files, supported Bloodborne reference, and bbport installation. Record startup, rendering, input, and save behavior separately. Do not treat an exit code or frame counter as proof of a complete gameplay test.
+Run `python3 -m unittest -v` for the six adapter tests and five launcher tests; no game files are needed. To try the game, read [runtime requirements](runtime.md) and use explicit paths to your own DS3 files, supported Bloodborne reference, and bbport installation. Record startup, rendering, input, and save behavior separately. Do not treat an exit code or frame counter as proof of a complete gameplay test.

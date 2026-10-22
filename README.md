@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — The Next Bonfire
-Version:     v1.3.0
+Version:     v1.4.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
-Date:        2026-10-16
-SHA256:      2864b65abcb9b2432d5d87dea0864d0339c6992ee9432bff878db3e73b47f0f1
+Date:        2026-10-21
+SHA256:      61fdffa28ee69f935ba655857bb34860d6dc3a4e026e3070156f68bd61e608f2
 Chain:       solana-mainnet
-Tx:          5NmGmjFNm21oDmxsYTm1MtASWrkea9KE7FrBvmxjpvoNP1bd1s7VBxqRuBkQDREJSwV3a1mNmte9iw8UfEihVdQ4
+Tx:          JGy7Mqjqt28m2MEwtcnYKbn6UWH2has64RRoNcKFnEJ2ZJyE1KHEcSBdEPHjNrkkGqTLBWFRPGQYwor7TRp3Wn3
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -18,7 +18,7 @@ A follow-up to Celaya Solutions’ Bloodborne-on-Mac work. This time, the road l
 
 Before you touch the code, learn what you are carrying: your own game, a backup you can trust, and evidence that tells you what actually worked. Pick a path. You can change it at any bonfire.
 
-> **Current state:** an early compatibility experiment, with an import adapter, launcher, six local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
+> **Current state:** an early compatibility experiment, with an import adapter, launcher, eleven local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
 
 ## Choose your path
 
@@ -63,7 +63,7 @@ The [quest](docs/quest.md) teaches why each check matters.
 
 ## Beyond the bonfire
 
-Continue with the [runtime guide](docs/runtime.md) after your backup is checked. You need a compatible, separately installed **bbport 0.4-v1 runtime**, your own **DS3 CUSA03388 v1.00** files, and your own supported **Bloodborne reference executable**. This repo does not install or bundle those inputs.
+Continue with the [runtime guide](docs/runtime.md) after your backup is checked. You need a compatible, separately installed **bbport 0.4-v1 runtime**, your own **DS3 CUSA03388 v1.00** files, and your own supported **Bloodborne reference executable**. This repo does not install or bundle those inputs. You can also [use a built bbport checkout](docs/runtime.md#use-the-local-bloodborne-runtime-improvements) with the local Bloodborne renderer improvements and play until you quit with `--timeout 0`.
 
 To work on the adapter without game files:
 

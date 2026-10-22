@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.3.0
+Version:     v1.4.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
-Date:        2026-10-16
-SHA256:      675db45d04cbd1fd4300cd1f77390db5ced04386fe5fc1aaca92ca6254207a97
+Date:        2026-10-21
+SHA256:      9a50bce178045fd68b89d6683a082e603dd3faea22dfc10f6fc687976273d680
 Chain:       solana-mainnet
-Tx:          VAEf5y4vjmQnBmdzM2zzTh9CiCwpFAoUT6YRMrJHcCVXZ2nronqPsAteps58mMnEEeDV6DB7d31SsDC5s4wV47f
+Tx:          2FPwqUDxXQZouD2vuqCbhn39awLxE4Bkh8WZSGsMNuXAwsnFnB5MKxxHdScPaLcnihAWAx7JzjFVZB7aDUUiMZAm
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -41,14 +41,55 @@ must match bbport's supported Bloodborne version.
 Each run creates a fresh folder under `runtime/`, including a separate Mac
 test app, save folder, settings, logs, frame data, and generated images.
 `--data` chooses a different fresh folder. Runs stop after the chosen time
-(1–600 seconds). Close any other bbport game before starting.
+(1–600 seconds, default 120). Use `--timeout 0` to play until you quit.
+Close any other bbport game before starting.
 To resume a test, pass `--save-from /path/to/previous-run/user`; the launcher
 copies that folder and leaves the earlier save untouched. Quit through the
 game's System menu before the time limit to avoid its unclean-exit warning.
+With no time limit, quit through that menu when you finish; the final report
+is written after the process exits.
 
 Keyboard controls: Space confirms; I/J/K/L move through menus; Return is
 Options and skips the opening movie. WASD moves, arrows turn the camera,
 3 attacks, and left Shift rolls. Hold a key briefly so the game sees it.
+
+## Use the local Bloodborne runtime improvements
+
+Both runtime layouts render through KosmicKrisp, which translates Vulkan to
+Apple Metal. The runtime and original game code are x86-64 and use Rosetta 2;
+this is not an ARM-native game port.
+
+`--bbport-src` selects an already-built bbport 0.4-v1 checkout instead of the
+packaged runtime. It needs `out/bb-probe`, `out/gpu/libbbgpu.dylib`, the Python
+scripts, and the standard `deps-x86_64/lib` dependencies, including KosmicKrisp.
+Build that trusted checkout with its own `tools/macos/setup_deps.sh` and
+`tools/macos/build.sh` first if needed. Do not pass both `--bbport` and
+`--bbport-src`. The packaged runtime remains the default.
+
+```sh
+python3 play.py \
+  --game /path/to/CUSA03388-app \
+  --bbport-src ~/Documents/bbport-mac \
+  --reference-game /path/to/supported-Bloodborne \
+  --save-from /path/to/previous-run/user \
+  --fps-size 3 --timeout 0
+```
+
+The reviewed local Bloodborne build adds two optional renderer patches:
+`vertex-format-standin.patch` replaces an unsupported vertex format with a
+32-bit stand-in, and `big-fps-counter.patch` enables `--fps-size 1` through `6`.
+They live in the Bloodborne project's `patches/bbport/` directory and retain
+their GPL-2.0-or-later terms. The source option uses the build you supply; it
+does not apply or build those patches. Omit `--fps-size` if your build lacks
+the counter patch. A stand-in can avoid a crash while rendering an incorrect
+draw; using it does not prove DS3 needs it or that a scene renders correctly.
+
+The launcher copies only the probe into its separate app and links to that
+build's GPU library and dependencies. It records the probe and GPU hashes in
+`out/result.json` when the session ends. It does not modify the source build,
+the earlier save, or Bloodborne settings. Bloodborne's executable-address,
+resolution, and frame-rate patches are not compatible evidence for DS3 and
+are never passed to this launcher.
 
 ## What the adapter fixes
 
@@ -77,7 +118,18 @@ git diff --check
 
 The tests cover the observed startup failure, library-ID collisions, version
 mismatches, unknown IDs, and preservation of all linked-image bytes outside
-the import names. Runtime logs and saves are ignored by Git.
+the import names. Launcher tests also cover both runtime layouts, matching
+Metal library paths, copied saves, rejected inputs, FPS scaling, and watchdogs.
+Runtime logs and saves are ignored by Git.
+
+## Source-build startup check — October 21, 2026
+
+The local bbport 0.4-v1 build with both patches remapped the same 455 imports,
+initialized KosmicKrisp, and displayed the opening logo with the enlarged FPS
+counter. The 20-second startup check ended at its configured watchdog
+(exit 142). This verifies startup and the overlay, not gameplay performance
+or the vertex fallback. Private logs and the runtime hashes are in
+`runtime/metal-smoke-20261021/out/` on the test machine.
 
 ## Recorded observations — October 16, 2026
 

@@ -14,14 +14,14 @@ import sys
 from import_adapter import adapt_image
 
 
-def make_test_app(root, data):
+def make_test_app(probe, libraries, data):
     """Give the isolated test its own Mac app identity for focus and input."""
     contents = data / 'DS3 Test.app' / 'Contents'
     binary = contents / 'MacOS' / 'bb-probe'
     binary.parent.mkdir(parents=True)
-    shutil.copy2(root / 'bin/bb-probe', binary)
-    (contents / 'lib').symlink_to(root / 'lib', target_is_directory=True)
-    (binary.parent / 'gpu').symlink_to(root / 'bin/gpu', target_is_directory=True)
+    shutil.copy2(probe, binary)
+    (contents / 'lib').symlink_to(libraries, target_is_directory=True)
+    (binary.parent / 'gpu').symlink_to(probe.parent / 'gpu', target_is_directory=True)
     (contents / 'Info.plist').write_bytes(plistlib.dumps({
         'CFBundleExecutable': 'bb-probe', 'CFBundleIdentifier': 'com.celayasolutions.ds3-test',
         'CFBundleName': 'DS3 Test', 'CFBundlePackageType': 'APPL', 'CFBundleVersion': '1',
@@ -35,18 +35,30 @@ def make_test_app(root, data):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--game', type=Path, required=True)
-    parser.add_argument('--bbport', type=Path, default=Path.home() / 'Documents/bloodborne/runtime/engines/bbport-0.4-v1/bbport.app/Contents/Resources/bbport')
+    engine = parser.add_mutually_exclusive_group()
+    engine.add_argument('--bbport', type=Path, default=Path.home() / 'Documents/bloodborne/runtime/engines/bbport-0.4-v1/bbport.app/Contents/Resources/bbport')
+    engine.add_argument('--bbport-src', type=Path, help='Use a built bbport 0.4-v1 checkout with deps-x86_64')
     parser.add_argument('--reference-game', type=Path, default=Path.home() / 'Documents/bloodborne/runtime/games/CUSA00900-109')
     parser.add_argument('--data', type=Path)
     parser.add_argument('--save-from', type=Path, help='Copy a prior test user folder into the fresh run')
-    parser.add_argument('--timeout', type=int, default=120)
+    parser.add_argument('--timeout', type=int, default=120, help='Stop after 1–600 seconds; 0 runs until you quit')
+    parser.add_argument('--fps-size', type=int, choices=range(1, 7), default=1,
+                        help='FPS counter scale; above 1 needs the optional bbport overlay patch')
     args = parser.parse_args()
-    if not 1 <= args.timeout <= 600:
-        parser.error('--timeout must be between 1 and 600 seconds')
+    if not 0 <= args.timeout <= 600:
+        parser.error('--timeout must be between 0 and 600 seconds')
+    if args.fps_size > 1 and not args.bbport_src:
+        parser.error('--fps-size above 1 needs --bbport-src with the optional overlay patch')
     if subprocess.run(['pgrep', '-x', 'bb-probe'], stdout=subprocess.DEVNULL).returncode == 0:
         parser.error('Close the running bbport test or game first')
-    game, root, reference = (p.expanduser().resolve() for p in (args.game, args.bbport, args.reference_game))
-    for p in (game / 'eboot.bin', reference / 'eboot.bin', root / 'bin/bb-probe', root / 'scripts/link_modules.py'):
+    game, root, reference = (p.expanduser().resolve() for p in (args.game, args.bbport_src or args.bbport, args.reference_game))
+    probe = root / ('out/bb-probe' if args.bbport_src else 'bin/bb-probe')
+    libraries = root / ('deps-x86_64/lib' if args.bbport_src else 'lib')
+    for p in (game / 'eboot.bin', game / 'sce_sys/param.sfo', reference / 'eboot.bin', probe,
+              probe.parent / 'gpu/libbbgpu.dylib', libraries / 'libvulkan.1.dylib',
+              libraries / 'kosmickrisp/kosmickrisp_mesa_icd.json',
+              root / 'scripts/link_modules.py', root / 'scripts/prepare.py',
+              root / 'scripts/game_check.py', root / 'scripts/content_profile.py'):
         if not p.is_file():
             parser.error(f'Missing input: {p}')
     sys.path.insert(0, str(root / 'scripts'))
@@ -72,7 +84,7 @@ def main():
     else:
         (data / 'user').mkdir()
     (data / 'bbport.ini').write_text('show_fps=1\nupscaler=off\nobject_motion=0\n')
-    binary = make_test_app(root, data)
+    binary = make_test_app(probe, libraries, data)
     previous = os.environ.get('BB_SKIP_GAME_CHECK')
     os.environ['BB_SKIP_GAME_CHECK'] = '1'
     try:
@@ -89,9 +101,10 @@ def main():
     env = {key: value for key, value in os.environ.items() if not key.startswith('BB_')}
     env.update(BB_CONFIG=str(data / 'bbport.ini'), BB_FULLSCREEN='0', BB_OBJECT_MOTION='0',
                BB_VBLANK_HZ='60', BB_FRAME_STATS='1', BB_FRAME_LOG=str(out / 'frames.csv'),
-               BB_VULKAN_LIBRARY=str(root / 'lib/libvulkan.1.dylib'),
-               SDL_VULKAN_LIBRARY=str(root / 'lib/libvulkan.1.dylib'),
-               VK_DRIVER_FILES=str(root / 'lib/kosmickrisp/kosmickrisp_mesa_icd.json'))
+               BB_FPS_SCALE=str(args.fps_size),
+               BB_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
+               SDL_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
+               VK_DRIVER_FILES=str(libraries / 'kosmickrisp/kosmickrisp_mesa_icd.json'))
     subprocess.run([sys.executable, str(root / 'scripts/content_profile.py'), str(game), '--out', str(out)],
                    env=env, check=True)
     command = [str(binary), str(out / 'boot-ds3.bin'),
@@ -99,13 +112,16 @@ def main():
                '--user', str(data / 'user'), '--timeout', str(args.timeout)]
     report = {'title': info['TITLE'], 'title_id': info['TITLE_ID'], 'version': info['APP_VER'],
               'game': str(game), 'bbport': str(root), 'remapped_imports': len(changes),
+              'runtime_layout': 'source' if args.bbport_src else 'packaged',
               'timeout_seconds': args.timeout, 'gameplay_verified': False,
-              'probe_sha256': hashlib.sha256((root / 'bin/bb-probe').read_bytes()).hexdigest()}
-    print(f'Remapped {len(changes)} imports. Starting {args.timeout}-second test. Log: {out / "run.log"}', flush=True)
+              'probe_sha256': hashlib.sha256(probe.read_bytes()).hexdigest(),
+              'gpu_sha256': hashlib.sha256((probe.parent / 'gpu/libbbgpu.dylib').read_bytes()).hexdigest()}
+    duration = f'{args.timeout}-second test' if args.timeout else 'session until you quit'
+    print(f'Remapped {len(changes)} imports. Starting {duration}. Log: {out / "run.log"}', flush=True)
     with (out / 'run.log').open('w') as log:
         try:
             result = subprocess.run(command, env=env, cwd=root, stdout=log, stderr=subprocess.STDOUT,
-                                    timeout=args.timeout + 15)
+                                    timeout=args.timeout + 15 if args.timeout else None)
             report['exit_code'] = result.returncode
         except subprocess.TimeoutExpired:
             report['exit_code'] = 124

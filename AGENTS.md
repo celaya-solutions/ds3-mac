@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — Agent Notes
-Version:     v1.1.2
+Version:     v1.2.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      422ea70b115e14266f6fad669a1f7c89356815c5fce930ce562043c197f67228
+SHA256:      bdf4fa44ef2d04499b1fc9b58dc91ea0e6994982f22f0403e13ea2fa555dc2db
 Chain:       solana-mainnet
-Tx:          8Xi52GEa3FNSy1HybUEVBbhw2Z8WWjBXqFce3FkLFzjU6uz3d9epMpcRziNuwY5JvbFibHSgJHvgLEyZ4HEUsdG
+Tx:          rC3uaDCPDnBqKVnac6yUkiZCfn25DJCJZdcsaEHYZqtp5TrQFUbaeUZsdA4HBCsCMYJ7nYqrncbPM6BL1ALb9wC
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -39,3 +39,5 @@ No Bloodborne project URL has been confirmed; add it when supplied. Keep future 
 2026-10-16: Unified all original code, docs, and prompts under standard MIT with CSR (Celaya Solutions) copyright credit. Updated every document license header and removed split-license terms; all six tests and license-consistency checks passed.
 
 2026-10-21: Measured tuning recorded in the README and runtime guide: 1080p with `BB_STAGING_KEEP_MB=2048` and `BB_FAULT_WINDOW=1024`, vblank unpaced, played at a median 53.6 FPS on an M5 Max over one short session in one area. Thread priority plus full screen hurt and were reverted. The launchers still strip `BB_*` variables, so that setup is a hand launch; keep the numbers tied to those conditions.
+
+2026-10-21 night: Launcher knobs shipped: `--tuned`, `--env`, `--patches`, `stats.py`, MetalFX Native AA default, Mesa cache pin; twenty-four tests. Engine work in the local bbport checkout, exported as three patches beside the Bloodborne project's: macOS host-import probe (import works, 6x faster GPU reads), guest memory in place through host-pointer import (`BB_GUEST_IN_PLACE=1` crashes DS3 in bbport's in-place command-write path unless `BB_GPU_COMMAND_WRITES=0`; unmeasured in play), and MetalFX frame interpolation (`BB_METALFX_INTERPOLATE=1`, smoke-clean, never seen in gameplay). Both engine flags stay off; the play rows are the owner's. Specs and plans under `docs/superpowers/`.

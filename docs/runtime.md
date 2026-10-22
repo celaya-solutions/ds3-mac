@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.9.0
+Version:     v1.10.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      6468ac907f9852098e08957d74369821e1cfcee80261f684b4ba41d46e153307
+SHA256:      611eff230263d1ba8578e5fae7c99101bfc47c0c0943362704318053aa8ffbb5
 Chain:       solana-mainnet
-Tx:          42zFDigvAARQ96iTVzaVPBYL7jb2cxXrbBzLGmPEKVt9NnEpax6sao4UBXXKy89Jk7sSrbntWWGK9SUAF89XZziL
+Tx:          uMN1n3bS6M2o8j2yv4PvwkL25TqCfTusRRLeiNxiqNFAangqGn46ZQENGdFP7hfG6hC4NzzfJPQCibPszkTRRKK
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -274,6 +274,20 @@ input), so the write-fault and FPS rows are still to be played:
 then `stats.py`. The flag stays off by default. The crash is in bbport's
 in-place write path, not in the import layer. Private logs:
 `runtime/smoke-guest-in-place*/out/run.log`.
+
+## MetalFX frame interpolation — October 21, 2026 (experimental, unmeasured)
+
+Built in the local bbport checkout (patch `metalfx-frame-interpolation.patch`):
+with `BB_METALFX_INTERPOLATE=1` and MetalFX selected, the engine shows a
+MetalFX-interpolated frame between every two real ones (the presented frame
+and the previous one, with the scaler's depth and motion; the real frame
+follows half a measured interval later). The upscaler-support test covers the
+gate; a 60-second launcher smoke with the flag ran to its watchdog with no
+fault, but stayed in menus, where the scaler does not run, so no interpolated
+frame was produced yet. Expect HUD ghosting (the HUD is interpolated with the
+scene) and half a frame of added latency. Try it from a prepared session:
+`restart.py <session> --tuned --env BB_METALFX_INTERPOLATE=1`, then `stats.py`
+reports `presented_fps` next to `median_fps`. Off by default.
 
 ## Recorded observations — October 16, 2026
 

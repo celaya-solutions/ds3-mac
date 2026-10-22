@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.4.0
+Version:     v1.5.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      9a50bce178045fd68b89d6683a082e603dd3faea22dfc10f6fc687976273d680
+SHA256:      dee7b20c383b8d9f9c51e72784a33ec2de0f229677c75274d4cad5ec9f01f4eb
 Chain:       solana-mainnet
-Tx:          2FPwqUDxXQZouD2vuqCbhn39awLxE4Bkh8WZSGsMNuXAwsnFnB5MKxxHdScPaLcnihAWAx7JzjFVZB7aDUUiMZAm
+Tx:          5LxG6afRvgoDixtPcZ2nQdvqdndmqkw3VnDaJEtKisXfxNrt2KmFbzhYhGKLewapyz9oFpvob9U82QFxvBLj8N34
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -39,7 +39,7 @@ reference under `~/Documents/bloodborne`. Override them with `--bbport` and
 must match bbport's supported Bloodborne version.
 
 Each run creates a fresh folder under `runtime/`, including a separate Mac
-test app, save folder, settings, logs, frame data, and generated images.
+test app, save folder, settings, logs, and generated images.
 `--data` chooses a different fresh folder. Runs stop after the chosen time
 (1–600 seconds, default 120). Use `--timeout 0` to play until you quit.
 Close any other bbport game before starting.
@@ -48,6 +48,32 @@ copies that folder and leaves the earlier save untouched. Quit through the
 game's System menu before the time limit to avoid its unclean-exit warning.
 With no time limit, quit through that menu when you finish; the final report
 is written after the process exits.
+
+### Reopen a session or use a Desktop shortcut
+
+After a session has finished and has a DS3 save, reopen it without preparing
+the game again:
+
+```sh
+python3 restart.py /path/to/previous-run --fps-size 3
+```
+
+Use `--fps-size 3` only with the patched source runtime; otherwise omit it.
+The shortcut installed on the local test Mac, **Dark Souls III.command** on
+the Desktop, runs this command with the prepared session's paths. Double-click
+it to play until you quit. Progress stays in that session's `user` folder.
+Each launch first copies the saves and settings into `backups/<timestamp>`;
+backup failure stops launch. Logs get separate `out/play-<timestamp>.log` files.
+Duplicate launches are rejected, and changed probe/GPU binaries require a fresh
+`play.py` run with `--save-from`. Keep the prepared session and engine in place.
+
+Fresh sessions default to native 1080p, upscaling off, object motion off, and
+live resolution changes off. Frame diagnostics are disabled to avoid their
+counters and per-frame disk writes; add `--frame-stats` to `play.py` for a
+diagnostic run. The shader cache remains enabled. Restarting preserves the
+session's saved settings. These are conservative low-overhead defaults, not
+a measured fastest preset. The engine's shadow, LOD, and startup resolution
+patches target Bloodborne and must not be applied to DS3.
 
 Keyboard controls: Space confirms; I/J/K/L move through menus; Return is
 Options and skips the opening movie. WASD moves, arrows turn the camera,
@@ -120,6 +146,8 @@ The tests cover the observed startup failure, library-ID collisions, version
 mismatches, unknown IDs, and preservation of all linked-image bytes outside
 the import names. Launcher tests also cover both runtime layouts, matching
 Metal library paths, copied saves, rejected inputs, FPS scaling, and watchdogs.
+Restart tests cover save backups, repeated progress, separate logs, disabled
+diagnostics, concurrent launches, changed runtimes, and backup failures.
 Runtime logs and saves are ignored by Git.
 
 ## Source-build startup check — October 21, 2026

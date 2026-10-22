@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — The Next Bonfire
-Version:     v1.4.0
+Version:     v1.4.1
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      61fdffa28ee69f935ba655857bb34860d6dc3a4e026e3070156f68bd61e608f2
+SHA256:      3a3c712a67f9b3fa185dde34c6960dbd6b84e22f362fcbd65551f8e1eef305d7
 Chain:       solana-mainnet
-Tx:          JGy7Mqjqt28m2MEwtcnYKbn6UWH2has64RRoNcKFnEJ2ZJyE1KHEcSBdEPHjNrkkGqTLBWFRPGQYwor7TRp3Wn3
+Tx:          2PjbTUPZEY1ZJFA4P9mUxTc1SKDApczures2BoTsD91NpJAfzE28rdW2egAQTizfeDfpyxNxR4pwM7ta7sT5QjoX
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -18,7 +18,7 @@ A follow-up to Celaya Solutions’ Bloodborne-on-Mac work. This time, the road l
 
 Before you touch the code, learn what you are carrying: your own game, a backup you can trust, and evidence that tells you what actually worked. Pick a path. You can change it at any bonfire.
 
-> **Current state:** an early compatibility experiment, with an import adapter, launcher, eleven local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
+> **Current state:** an early compatibility experiment, with an import adapter, launcher, sixteen local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
 
 ## Choose your path
 

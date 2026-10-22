@@ -1,12 +1,12 @@
 ```text
 Document:    The Pilgrimage — A Dark Souls III Mac Learning Quest
-Version:     v1.3.1
+Version:     v1.3.2
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      096eceaf5528189d0f356e3250aba3bf32b379678f15cafffb42836b6d2a26c2
+SHA256:      48cf0c410963cd6f1f864d64f94f1e3270bbdca02ee91218b7a841755e84a318
 Chain:       solana-mainnet
-Tx:          5rvFf4RZxVKYG9zhWTGormjW2K3uMWQRwpvsHTHuH6Y61DKVhDde8kdd7GgzKFHCCjLFJvdrw8Riq5rLiej7uQFZ
+Tx:          41cmv8tpGVaFHKPmurB1xStvbbsEEfP5Dk84WRoR5TGZ7knoDRe375nZwj8nHfYXxud39VaEpWdkpp7oUje77hXr
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -180,4 +180,4 @@ The IDs are local to each executable. The adapter reads the library and module i
 
 </details>
 
-**Bonfire:** explain why names *and versions* matter. Then run the tests (six adapter checks and five launcher checks) and read the test that checks that bytes outside import-name slots stay unchanged. For a live experiment, continue to the [runtime guide](runtime.md) and record your own observations.
+**Bonfire:** explain why names *and versions* matter. Then run the adapter, launcher, and restart tests and read the test that checks that bytes outside import-name slots stay unchanged. For a live experiment, continue to the [runtime guide](runtime.md) and record your own observations.

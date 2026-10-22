@@ -14,6 +14,23 @@ import sys
 from import_adapter import adapt_image
 
 
+DEFAULT_SETTINGS = ('show_fps=1\nupscaler=off\nobject_motion=0\n'
+                    'output_res=1920x1080\nlive_resolution=0\n')
+
+
+def runtime_environment(data, libraries, fps_size=1, frame_stats=False):
+    """Keep Bloodborne patches and diagnostics out of ordinary DS3 sessions."""
+    env = {key: value for key, value in os.environ.items() if not key.startswith('BB_')}
+    env.update(BB_CONFIG=str(data / 'bbport.ini'), BB_FULLSCREEN='0', BB_OBJECT_MOTION='0',
+               BB_VBLANK_HZ='60', BB_FPS_SCALE=str(fps_size),
+               BB_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
+               SDL_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
+               VK_DRIVER_FILES=str(libraries / 'kosmickrisp/kosmickrisp_mesa_icd.json'))
+    if frame_stats:
+        env.update(BB_FRAME_STATS='1', BB_FRAME_LOG=str(data / 'out/frames.csv'))
+    return env
+
+
 def make_test_app(probe, libraries, data):
     """Give the isolated test its own Mac app identity for focus and input."""
     contents = data / 'DS3 Test.app' / 'Contents'
@@ -44,6 +61,7 @@ def main():
     parser.add_argument('--timeout', type=int, default=120, help='Stop after 1–600 seconds; 0 runs until you quit')
     parser.add_argument('--fps-size', type=int, choices=range(1, 7), default=1,
                         help='FPS counter scale; above 1 needs the optional bbport overlay patch')
+    parser.add_argument('--frame-stats', action='store_true', help='Enable diagnostic counters and frame CSV')
     args = parser.parse_args()
     if not 0 <= args.timeout <= 600:
         parser.error('--timeout must be between 0 and 600 seconds')
@@ -83,7 +101,7 @@ def main():
         shutil.copytree(save_from, data / 'user')
     else:
         (data / 'user').mkdir()
-    (data / 'bbport.ini').write_text('show_fps=1\nupscaler=off\nobject_motion=0\n')
+    (data / 'bbport.ini').write_text(DEFAULT_SETTINGS)
     binary = make_test_app(probe, libraries, data)
     previous = os.environ.get('BB_SKIP_GAME_CHECK')
     os.environ['BB_SKIP_GAME_CHECK'] = '1'
@@ -98,13 +116,7 @@ def main():
     changes = adapt_image(out / 'boot-linked.bin', out / 'boot-ds3.bin',
                           module(game / 'eboot.bin'), module(reference / 'eboot.bin'))
     (out / 'import-adapter.json').write_text(json.dumps(changes, indent=2) + '\n')
-    env = {key: value for key, value in os.environ.items() if not key.startswith('BB_')}
-    env.update(BB_CONFIG=str(data / 'bbport.ini'), BB_FULLSCREEN='0', BB_OBJECT_MOTION='0',
-               BB_VBLANK_HZ='60', BB_FRAME_STATS='1', BB_FRAME_LOG=str(out / 'frames.csv'),
-               BB_FPS_SCALE=str(args.fps_size),
-               BB_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
-               SDL_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
-               VK_DRIVER_FILES=str(libraries / 'kosmickrisp/kosmickrisp_mesa_icd.json'))
+    env = runtime_environment(data, libraries, args.fps_size, args.frame_stats)
     subprocess.run([sys.executable, str(root / 'scripts/content_profile.py'), str(game), '--out', str(out)],
                    env=env, check=True)
     command = [str(binary), str(out / 'boot-ds3.bin'),

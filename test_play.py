@@ -76,7 +76,8 @@ class LauncherTests(unittest.TestCase):
                 probe, libraries = self.make_engine(source)
                 option = '--bbport-src' if source else '--bbport'
                 with patch.dict(os.environ, {'BB_PATCHES': 'Bloodborne patch', 'BB_FPS': '90',
-                                             'BB_RENDER_RES': '2560x1440', 'BB_FPS_SCALE': '6'}):
+                                             'BB_RENDER_RES': '2560x1440', 'BB_FPS_SCALE': '6',
+                                             'BB_FRAME_STATS': '1', 'BB_FRAME_LOG': '/tmp/old.csv'}):
                     self.assertEqual(self.launch(option, str(self.engine)), 0)
                 command, kwargs = self.launches[-1]
                 env = kwargs['env']
@@ -84,6 +85,9 @@ class LauncherTests(unittest.TestCase):
                 self.assertEqual(env['BB_VULKAN_LIBRARY'], str(libraries / 'libvulkan.1.dylib'))
                 self.assertEqual(env['SDL_VULKAN_LIBRARY'], env['BB_VULKAN_LIBRARY'])
                 self.assertEqual(env['BB_FPS_SCALE'], '1')
+                self.assertNotIn('BB_FRAME_STATS', env)
+                self.assertNotIn('BB_FRAME_LOG', env)
+                self.assertEqual((self.data / 'bbport.ini').read_text(), play.DEFAULT_SETTINGS)
                 self.assertFalse({'BB_PATCHES', 'BB_FPS', 'BB_RENDER_RES'} & env.keys())
                 self.assertNotIn('--patches', command)
                 self.assertEqual(command[-2:], ['--timeout', '120'])
@@ -105,11 +109,14 @@ class LauncherTests(unittest.TestCase):
 
     def test_source_counter_scale_and_no_watchdog(self):
         self.make_engine(True)
-        self.assertEqual(self.launch('--bbport-src', str(self.engine), '--fps-size', '3', '--timeout', '0'), 0)
+        self.assertEqual(self.launch('--bbport-src', str(self.engine), '--fps-size', '3',
+                                     '--timeout', '0', '--frame-stats'), 0)
         command, kwargs = self.launches[-1]
         self.assertEqual(command[-2:], ['--timeout', '0'])
         self.assertIsNone(kwargs['timeout'])
         self.assertEqual(kwargs['env']['BB_FPS_SCALE'], '3')
+        self.assertEqual(kwargs['env']['BB_FRAME_STATS'], '1')
+        self.assertEqual(kwargs['env']['BB_FRAME_LOG'], str(self.data / 'out/frames.csv'))
 
     def test_invalid_options_and_missing_gpu_fail_before_creating_session(self):
         probe, _ = self.make_engine(True)

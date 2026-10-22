@@ -144,6 +144,18 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.launches[-1][1]['env']['BB_VBLANK_HZ'], '60')
         self.assertEqual(json.loads((self.data / 'out/result.json').read_text())['extra_env'], [])
 
+    def test_patch_file_is_copied_passed_and_hashed(self):
+        self.make_engine(True)
+        patch = self.root / 'limiter.bin'
+        patch.write_bytes(b'BBPATCH2 test')
+        self.assertEqual(self.launch('--bbport-src', str(self.engine), '--patches', str(patch)), 0)
+        command = self.launches[-1][0]
+        copied = self.data / 'out/patches.bin'
+        self.assertEqual(command[command.index('--patches') + 1], str(copied))
+        self.assertEqual(copied.read_bytes(), b'BBPATCH2 test')
+        report = json.loads((self.data / 'out/result.json').read_text())
+        self.assertEqual(report['patches_sha256'], hashlib.sha256(b'BBPATCH2 test').hexdigest())
+
     def test_invalid_options_and_missing_gpu_fail_before_creating_session(self):
         probe, _ = self.make_engine(True)
         (probe.parent / 'gpu/libbbgpu.dylib').unlink()
@@ -151,7 +163,8 @@ class LauncherTests(unittest.TestCase):
                         ['--bbport', str(self.engine), '--fps-size', '2'],
                         ['--bbport', str(self.engine), '--bbport-src', str(self.engine)],
                         ['--timeout', '-1'], ['--timeout', '601'], ['--fps-size', '7'],
-                        ['--env', 'FOO=1'], ['--env', 'BB_X'], ['--env', 'PATH=/x']):
+                        ['--env', 'FOO=1'], ['--env', 'BB_X'], ['--env', 'PATH=/x'],
+                        ['--patches', str(self.root / 'missing.bin')]):
             with self.subTest(options=options), self.assertRaises(SystemExit):
                 self.launch(*options)
             self.assertFalse(self.data.exists())

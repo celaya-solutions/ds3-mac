@@ -57,6 +57,24 @@ print('test runtime')
         return subprocess.run([sys.executable, str(Path(restart.__file__)), str(self.data),
                                '--fps-size', '3', *options], env=env, capture_output=True, text=True)
 
+    def test_patch_file_is_passed_when_recorded_and_refused_when_changed(self):
+        self.assertEqual(self.run_restart().returncode, 0)
+        self.assertNotIn('--patches', json.loads((self.data / 'arguments.json').read_text()))
+        patch = self.data / 'out/patches.bin'
+        patch.write_bytes(b'BBPATCH2 test')
+        report = json.loads(self.report.read_text())
+        report['patches_sha256'] = hashlib.sha256(b'BBPATCH2 test').hexdigest()
+        self.report.write_text(json.dumps(report))
+        self.report_before = self.report.read_bytes()
+        self.assertEqual(self.run_restart().returncode, 0)
+        arguments = json.loads((self.data / 'arguments.json').read_text())
+        self.assertEqual(arguments[arguments.index('--patches') + 1], str(patch.resolve()))
+        patch.write_bytes(b'edited')
+        result = self.run_restart()
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('Patch file changed', result.stderr)
+        self.assertEqual(len(list((self.data / 'backups').iterdir())), 2)
+
     def test_restart_replays_recorded_extras_unless_overridden(self):
         report = json.loads(self.report.read_text())
         report['extra_env'] = ['BB_VBLANK_HZ=0', 'BB_STAGING_KEEP_MB=2048']

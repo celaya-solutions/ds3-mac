@@ -80,6 +80,7 @@ def main():
     parser.add_argument('--fps-size', type=int, choices=range(1, 7), default=1,
                         help='FPS counter scale; above 1 needs the optional bbport overlay patch')
     parser.add_argument('--frame-stats', action='store_true', help='Enable diagnostic counters and frame CSV')
+    parser.add_argument('--patches', type=Path, help='Owner-supplied BBPATCH2 file, copied into the session and passed to the probe')
     parser.add_argument('--tuned', action='store_true', help='Apply the measured October 21 runtime setup')
     parser.add_argument('--env', action='append', default=[], metavar='KEY=VALUE',
                         help='Runtime (BB_*) or shader cache (MESA_*) override; repeatable, applied after --tuned')
@@ -95,6 +96,9 @@ def main():
     if subprocess.run(['pgrep', '-x', 'bb-probe'], stdout=subprocess.DEVNULL).returncode == 0:
         parser.error('Close the running bbport test or game first')
     game, root, reference = (p.expanduser().resolve() for p in (args.game, args.bbport_src or args.bbport, args.reference_game))
+    patches = args.patches.expanduser().resolve() if args.patches else None
+    if patches and not patches.is_file():
+        parser.error(f'Missing input: {patches}')
     probe = root / ('out/bb-probe' if args.bbport_src else 'bin/bb-probe')
     libraries = root / ('deps-x86_64/lib' if args.bbport_src else 'lib')
     for p in (game / 'eboot.bin', game / 'sce_sys/param.sfo', reference / 'eboot.bin', probe,
@@ -127,6 +131,8 @@ def main():
     else:
         (data / 'user').mkdir()
     (data / 'bbport.ini').write_text(DEFAULT_SETTINGS)
+    if patches:
+        shutil.copy2(patches, out / 'patches.bin')
     binary = make_test_app(probe, libraries, data)
     previous = os.environ.get('BB_SKIP_GAME_CHECK')
     os.environ['BB_SKIP_GAME_CHECK'] = '1'
@@ -146,7 +152,9 @@ def main():
                    env=env, check=True)
     command = [str(binary), str(out / 'boot-ds3.bin'),
                '--content-profile', str(out / 'content.bin'), '--app0', str(game),
-               '--user', str(data / 'user'), '--timeout', str(args.timeout)]
+               '--user', str(data / 'user'),
+               *(['--patches', str(out / 'patches.bin')] if patches else []),
+               '--timeout', str(args.timeout)]
     report = {'title': info['TITLE'], 'title_id': info['TITLE_ID'], 'version': info['APP_VER'],
               'game': str(game), 'bbport': str(root), 'remapped_imports': len(changes),
               'runtime_layout': 'source' if args.bbport_src else 'packaged',
@@ -154,6 +162,8 @@ def main():
               'probe_sha256': hashlib.sha256(probe.read_bytes()).hexdigest(),
               'app_probe_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
               'gpu_sha256': hashlib.sha256((probe.parent / 'gpu/libbbgpu.dylib').read_bytes()).hexdigest()}
+    if patches:
+        report['patches_sha256'] = hashlib.sha256((out / 'patches.bin').read_bytes()).hexdigest()
     duration = f'{args.timeout}-second test' if args.timeout else 'session until you quit'
     print(f'Remapped {len(changes)} imports. Starting {duration}. Log: {out / "run.log"}', flush=True)
     with (out / 'run.log').open('w') as log:

@@ -54,6 +54,10 @@ def main():
         for path, key in ((binary, 'app_probe_sha256'), (gpu, 'gpu_sha256')):
             if hashlib.sha256(path.read_bytes()).hexdigest() != report[key]:
                 parser.error('Runtime changed; prepare a fresh session with play.py --save-from first')
+        patches = data / 'out/patches.bin' if 'patches_sha256' in report else None
+        if patches and (not patches.is_file()
+                        or hashlib.sha256(patches.read_bytes()).hexdigest() != report['patches_sha256']):
+            parser.error('Patch file changed; prepare a fresh session with play.py --save-from first')
         with (data / '.play.lock').open('a') as lock:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -69,7 +73,8 @@ def main():
             print(f'Save backup: {backup}\nLog: {log_path}\nQuit through the game menu.', flush=True)
             command = [str(binary), str(data / 'out/boot-ds3.bin'),
                        '--content-profile', str(data / 'out/content.bin'), '--app0', str(game),
-                       '--user', str(data / 'user'), '--timeout', '0']
+                       '--user', str(data / 'user'),
+                       *(['--patches', str(patches)] if patches else []), '--timeout', '0']
             with log_path.open('x') as log:
                 result = subprocess.run(command, cwd=root,
                                         env=runtime_environment(data, libraries, args.fps_size, extra=extras),

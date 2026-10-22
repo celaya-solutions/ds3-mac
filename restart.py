@@ -11,7 +11,7 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from play import runtime_environment
+from play import TUNED, parse_env, runtime_environment
 
 
 def main():
@@ -19,10 +19,17 @@ def main():
     parser.add_argument('data', type=Path, help='Completed play.py session folder')
     parser.add_argument('--fps-size', type=int, choices=range(1, 7), default=1,
                         help='Counter scale; above 1 requires the optional overlay patch')
+    parser.add_argument('--tuned', action='store_true',
+                        help='Apply the measured October 21 runtime setup instead of the recorded one')
+    parser.add_argument('--env', action='append', default=[], metavar='KEY=VALUE',
+                        help='Runtime (BB_*) or shader cache (MESA_*) override; replaces the recorded ones')
     args = parser.parse_args()
     data = args.data.expanduser().resolve()
     try:
+        extras = [*(TUNED if args.tuned else ()), *parse_env(args.env)]
         report = json.loads((data / 'out/result.json').read_text())
+        if not args.tuned and not args.env:
+            extras = list(report.get('extra_env', []))
         if (report['title_id'], report['version']) != ('CUSA03388', '01.00'):
             parser.error('This launcher supports only DS3 CUSA03388 version 01.00')
         game, root = Path(report['game']), Path(report['bbport'])
@@ -65,7 +72,7 @@ def main():
                        '--user', str(data / 'user'), '--timeout', '0']
             with log_path.open('x') as log:
                 result = subprocess.run(command, cwd=root,
-                                        env=runtime_environment(data, libraries, args.fps_size),
+                                        env=runtime_environment(data, libraries, args.fps_size, extra=extras),
                                         stdout=log, stderr=subprocess.STDOUT)
             print(f'Game exited with code {result.returncode}. Log: {log_path}', flush=True)
             return result.returncode if result.returncode >= 0 else 128 - result.returncode

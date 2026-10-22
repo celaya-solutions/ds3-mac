@@ -123,13 +123,35 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(kwargs['env']['BB_FRAME_STATS'], '1')
         self.assertEqual(kwargs['env']['BB_FRAME_LOG'], str(self.data / 'out/frames.csv'))
 
+    def test_tuned_and_env_override_defaults_but_not_session_paths(self):
+        self.make_engine(True)
+        self.assertEqual(self.launch('--bbport-src', str(self.engine), '--tuned',
+                                     '--env', 'BB_VBLANK_HZ=30', '--env', 'BB_CONFIG=/elsewhere'), 0)
+        env = self.launches[-1][1]['env']
+        self.assertEqual(env['BB_VBLANK_HZ'], '30')
+        self.assertEqual(env['BB_STAGING_KEEP_MB'], '2048')
+        self.assertEqual(env['BB_FAULT_WINDOW'], '1024')
+        self.assertEqual(env['BB_RETINA'], '0')
+        self.assertEqual(env['BB_CONFIG'], str(self.data / 'bbport.ini'))
+        self.assertEqual(env['MESA_SHADER_CACHE_MAX_SIZE'], '4G')
+        self.assertTrue(Path(env['MESA_SHADER_CACHE_DIR']).is_dir())
+        report = json.loads((self.data / 'out/result.json').read_text())
+        self.assertEqual(report['extra_env'], [*play.TUNED, 'BB_VBLANK_HZ=30', 'BB_CONFIG=/elsewhere'])
+
+    def test_untuned_session_keeps_60_hz_vblank_and_records_empty_extras(self):
+        self.make_engine(True)
+        self.assertEqual(self.launch('--bbport-src', str(self.engine)), 0)
+        self.assertEqual(self.launches[-1][1]['env']['BB_VBLANK_HZ'], '60')
+        self.assertEqual(json.loads((self.data / 'out/result.json').read_text())['extra_env'], [])
+
     def test_invalid_options_and_missing_gpu_fail_before_creating_session(self):
         probe, _ = self.make_engine(True)
         (probe.parent / 'gpu/libbbgpu.dylib').unlink()
         for options in (['--bbport-src', str(self.engine)],
                         ['--bbport', str(self.engine), '--fps-size', '2'],
                         ['--bbport', str(self.engine), '--bbport-src', str(self.engine)],
-                        ['--timeout', '-1'], ['--timeout', '601'], ['--fps-size', '7']):
+                        ['--timeout', '-1'], ['--timeout', '601'], ['--fps-size', '7'],
+                        ['--env', 'FOO=1'], ['--env', 'BB_X'], ['--env', 'PATH=/x']):
             with self.subTest(options=options), self.assertRaises(SystemExit):
                 self.launch(*options)
             self.assertFalse(self.data.exists())

@@ -29,9 +29,10 @@ class RestartTests(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'original')
         self.binary.write_text('''#!/usr/bin/env python3
-import json, os
+import json, os, sys
 from pathlib import Path
 Path('environment.json').write_text(json.dumps(dict(os.environ)))
+Path('arguments.json').write_text(json.dumps(sys.argv[1:]))
 Path('user/savedata/1/CUSA03388/DS30000/save').write_bytes(b'new progress')
 print('test runtime')
 ''')
@@ -49,12 +50,27 @@ print('test runtime')
         self.pgrep.write_text('#!/bin/sh\nexit 1\n')
         self.pgrep.chmod(0o755)
 
-    def run_restart(self):
+    def run_restart(self, *options):
         import os
         env = dict(os.environ, PATH=str(self.pgrep.parent) + os.pathsep + os.environ['PATH'],
                    BB_PATCHES='unsafe', BB_FRAME_STATS='1', BB_FRAME_LOG='/tmp/old.csv')
         return subprocess.run([sys.executable, str(Path(restart.__file__)), str(self.data),
-                               '--fps-size', '3'], env=env, capture_output=True, text=True)
+                               '--fps-size', '3', *options], env=env, capture_output=True, text=True)
+
+    def test_restart_replays_recorded_extras_unless_overridden(self):
+        report = json.loads(self.report.read_text())
+        report['extra_env'] = ['BB_VBLANK_HZ=0', 'BB_STAGING_KEEP_MB=2048']
+        self.report.write_text(json.dumps(report))
+        self.report_before = self.report.read_bytes()
+        self.assertEqual(self.run_restart().returncode, 0)
+        env = json.loads((self.data / 'environment.json').read_text())
+        self.assertEqual((env['BB_VBLANK_HZ'], env['BB_STAGING_KEEP_MB']), ('0', '2048'))
+        self.assertEqual(self.run_restart('--env', 'BB_VBLANK_HZ=30').returncode, 0)
+        env = json.loads((self.data / 'environment.json').read_text())
+        self.assertEqual(env['BB_VBLANK_HZ'], '30')
+        self.assertNotIn('BB_STAGING_KEEP_MB', env)
+        self.assertEqual(self.run_restart('--env', 'FOO=1').returncode, 2)
+        self.assertEqual(self.report.read_bytes(), self.report_before)
 
     def test_restarts_preserve_latest_progress_backups_and_original_report(self):
         for prior in (b'original', b'new progress'):

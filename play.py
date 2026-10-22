@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
@@ -16,13 +17,30 @@ from import_adapter import adapt_image
 
 DEFAULT_SETTINGS = ('show_fps=1\nupscaler=off\nobject_motion=0\n'
                     'output_res=1920x1080\nlive_resolution=0\n')
+# The setup measured on October 21, 2026 (docs/runtime.md): unpaced vblank, a larger staging
+# pool, a wider write-fault window, and no Retina scaling of the window.
+TUNED = ('BB_VBLANK_HZ=0', 'BB_STAGING_KEEP_MB=2048', 'BB_FAULT_WINDOW=1024', 'BB_RETINA=0')
+ENV_KEY = re.compile(r'^(BB|MESA)_[A-Z0-9_]+$')
 
 
-def runtime_environment(data, libraries, fps_size=1, frame_stats=False):
+def parse_env(values):
+    """Accept only KEY=VALUE overrides for the runtime (BB_*) and the shader cache (MESA_*)."""
+    for value in values:
+        key, separator, _ = value.partition('=')
+        if not separator or not ENV_KEY.match(key):
+            raise ValueError(f'--env expects BB_* or MESA_* KEY=VALUE, got {value!r}')
+    return list(values)
+
+
+def runtime_environment(data, libraries, fps_size=1, frame_stats=False, extra=()):
     """Keep Bloodborne patches and diagnostics out of ordinary DS3 sessions."""
     env = {key: value for key, value in os.environ.items() if not key.startswith('BB_')}
-    env.update(BB_CONFIG=str(data / 'bbport.ini'), BB_FULLSCREEN='0', BB_OBJECT_MOTION='0',
-               BB_VBLANK_HZ='60', BB_FPS_SCALE=str(fps_size),
+    cache = Path(__file__).resolve().parent / 'runtime/cache/mesa'
+    cache.mkdir(parents=True, exist_ok=True)
+    env.update(BB_FULLSCREEN='0', BB_OBJECT_MOTION='0', BB_VBLANK_HZ='60',
+               MESA_SHADER_CACHE_DIR=str(cache), MESA_SHADER_CACHE_MAX_SIZE='4G')
+    env.update(value.split('=', 1) for value in extra)
+    env.update(BB_CONFIG=str(data / 'bbport.ini'), BB_FPS_SCALE=str(fps_size),
                BB_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
                SDL_VULKAN_LIBRARY=str(libraries / 'libvulkan.1.dylib'),
                VK_DRIVER_FILES=str(libraries / 'kosmickrisp/kosmickrisp_mesa_icd.json'))
@@ -62,7 +80,14 @@ def main():
     parser.add_argument('--fps-size', type=int, choices=range(1, 7), default=1,
                         help='FPS counter scale; above 1 needs the optional bbport overlay patch')
     parser.add_argument('--frame-stats', action='store_true', help='Enable diagnostic counters and frame CSV')
+    parser.add_argument('--tuned', action='store_true', help='Apply the measured October 21 runtime setup')
+    parser.add_argument('--env', action='append', default=[], metavar='KEY=VALUE',
+                        help='Runtime (BB_*) or shader cache (MESA_*) override; repeatable, applied after --tuned')
     args = parser.parse_args()
+    try:
+        extras = [*(TUNED if args.tuned else ()), *parse_env(args.env)]
+    except ValueError as error:
+        parser.error(str(error))
     if not 0 <= args.timeout <= 600:
         parser.error('--timeout must be between 0 and 600 seconds')
     if args.fps_size > 1 and not args.bbport_src:
@@ -116,7 +141,7 @@ def main():
     changes = adapt_image(out / 'boot-linked.bin', out / 'boot-ds3.bin',
                           module(game / 'eboot.bin'), module(reference / 'eboot.bin'))
     (out / 'import-adapter.json').write_text(json.dumps(changes, indent=2) + '\n')
-    env = runtime_environment(data, libraries, args.fps_size, args.frame_stats)
+    env = runtime_environment(data, libraries, args.fps_size, args.frame_stats, extras)
     subprocess.run([sys.executable, str(root / 'scripts/content_profile.py'), str(game), '--out', str(out)],
                    env=env, check=True)
     command = [str(binary), str(out / 'boot-ds3.bin'),
@@ -125,7 +150,7 @@ def main():
     report = {'title': info['TITLE'], 'title_id': info['TITLE_ID'], 'version': info['APP_VER'],
               'game': str(game), 'bbport': str(root), 'remapped_imports': len(changes),
               'runtime_layout': 'source' if args.bbport_src else 'packaged',
-              'timeout_seconds': args.timeout, 'gameplay_verified': False,
+              'timeout_seconds': args.timeout, 'gameplay_verified': False, 'extra_env': extras,
               'probe_sha256': hashlib.sha256(probe.read_bytes()).hexdigest(),
               'app_probe_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
               'gpu_sha256': hashlib.sha256((probe.parent / 'gpu/libbbgpu.dylib').read_bytes()).hexdigest()}

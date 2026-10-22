@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — Agent Notes
-Version:     v1.1.1
+Version:     v1.1.2
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
-Date:        2026-10-16
-SHA256:      1a0ba810619de234829df187c649acd88663b69140cdf639b41a4f421ad3203e
+Date:        2026-10-21
+SHA256:      422ea70b115e14266f6fad669a1f7c89356815c5fce930ce562043c197f67228
 Chain:       solana-mainnet
-Tx:          5ZMWk8W59UF4oyeT3QHLzBRKyAZDRdeBoY9LjxCwjgF8vps8J8531hAGATpmDWNb5fxA8bqZM8eJi22VqFBWuTCy
+Tx:          8Xi52GEa3FNSy1HybUEVBbhw2Z8WWjBXqFce3FkLFzjU6uz3d9epMpcRziNuwY5JvbFibHSgJHvgLEyZ4HEUsdG
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -37,3 +37,5 @@ No Bloodborne project URL has been confirmed; add it when supplied. Keep future 
 2026-10-16 completion: Integrated the adapter and public guides; all six tests, document links, closed disclosures, and header hashes passed local checks. Profile pinning could not run because the browser connection list was empty; use GitHub’s Customize your pins control.
 
 2026-10-16: Unified all original code, docs, and prompts under standard MIT with CSR (Celaya Solutions) copyright credit. Updated every document license header and removed split-license terms; all six tests and license-consistency checks passed.
+
+2026-10-21: Measured tuning recorded in the README and runtime guide: 1080p with `BB_STAGING_KEEP_MB=2048` and `BB_FAULT_WINDOW=1024`, vblank unpaced, played at a median 53.6 FPS on an M5 Max over one short session in one area. Thread priority plus full screen hurt and were reverted. The launchers still strip `BB_*` variables, so that setup is a hand launch; keep the numbers tied to those conditions.

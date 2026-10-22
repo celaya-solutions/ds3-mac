@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.5.1
+Version:     v1.6.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      fbf09d318eccd4b86ddd0200eb9cc540ff3a360ef0a3205d680b0cbd29946d2c
+SHA256:      4e904970878639bcb12622712a19574a7f859d1532a4d35ab1775c276f83adb4
 Chain:       solana-mainnet
-Tx:          2fnHpf2BNCKBpX7iCSZRgFvGokir25gECuk8J1H24s8EAwzBbGAznCWX1ubCxNbwhhwCbxxa4iaAFi16TECFRqsw
+Tx:          2yBvnkYaMkgTW4bv6wCWmcFo873tFxsnwpYviTEHLP4t3R9bAHh6kpzYumL4AuzKxnJ3b1AsgbJVuUtFRchwjQAR
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -73,9 +73,10 @@ Fresh sessions default to native 1080p, upscaling off, object motion off, and
 live resolution changes off. Frame diagnostics are disabled to avoid their
 counters and per-frame disk writes; add `--frame-stats` to `play.py` for a
 diagnostic run. The shader cache remains enabled. Restarting preserves the
-session's saved settings. These are conservative low-overhead defaults, not
-a measured fastest preset. The engine's shadow, LOD, and startup resolution
-patches target Bloodborne and must not be applied to DS3.
+session's saved settings. These are conservative low-overhead defaults. A
+measured faster setup from October 21 is [below](#measured-tuning--october-21-2026);
+the launchers do not expose its knobs yet. The engine's shadow, LOD, and startup
+resolution patches target Bloodborne and must not be applied to DS3.
 
 Keyboard controls: Space confirms; I/J/K/L move through menus; Return is
 Options and skips the opening movie. WASD moves, arrows turn the camera,
@@ -161,6 +162,56 @@ counter. The 20-second startup check ended at its configured watchdog
 (exit 142). This verifies startup and the overlay, not gameplay performance
 or the vertex fallback. Private logs and the runtime hashes are in
 `runtime/metal-smoke-20261021/out/` on the test machine.
+
+## Measured tuning — October 21, 2026
+
+Conditions: MacBook Pro M5 Max (18 cores, 128 GB), macOS 27.0, bbport 0.4-v1
+source build (`--bbport-src`) under Rosetta 2 with KosmicKrisp, game window on
+an external 1920×1080 60 Hz monitor, `BB_FRAME_STATS=1` with the frame CSV,
+the frame-limiter code patch below, vblank unpaced (`BB_VBLANK_HZ=0`). Each
+row is one short play stretch, gameplay frames only (draw count above 500).
+
+| Setup | Play | Median FPS | p10 FPS | p1 FPS | Frames over 50 ms | Write faults ms/frame |
+| --- | --- | --- | --- | --- | --- | --- |
+| Native 2560×1440 patch, MetalFX, defaults | 20 min | 39.5 | 28.7 | 15.6 | 845 | 15.1 |
+| 1080p + `BB_STAGING_KEEP_MB=2048` + `BB_FAULT_WINDOW=1024` | 3 min | 53.6 | 42.0 | 28.2 | 13 | 11.8 |
+| Same + `BB_GPU_QOS=1` + macOS full screen (Game Mode tag) | 3 min | 48.2 | 33.6 | 23.9 | 12 | 22.3 |
+
+What the counters said: the emulator's GPU command thread was 98–100% busy
+and the game threads spent 12–22 ms per frame in write-fault handling, while
+the GPU itself was 24–47% busy. Rendering 1440p for a 1080p monitor was wasted
+work but not the limit. Stalls of 270–440 ms were texture streaming uploads of
+15–16 MB, with a few shader compiles up to 2.9 s. A larger staging pool and a
+wider fault window removed most of them. Interactive thread priority plus full
+screen doubled the write-fault time and was reverted; those two changes were
+not separated and the play areas differed, so that comparison is indicative
+only.
+
+Code patches, compiled with the bbport patch tools into a `--patches` file,
+offsets for CUSA03388 v1.00 only: at `0x18314b0` the bytes `41 0f 46 c6`
+become `90 90 90 90` (frame limiter test). The 1440p row also changed
+`80 07 00 00 38 04 00 00` at `0x5ac2ffc` to `00 0a 00 00 a0 05 00 00`
+(render size 1920×1080 to 2560×1440).
+
+`play.py` and `restart.py` replace every `BB_*` variable with their own, so
+this setup was launched by hand from a prepared session folder, with
+`bbport.ini` set to `output_res=1920x1080`, `upscaler=metalfx`, `show_fps=1`,
+from the bbport checkout as the working directory. Back up `user/` first, as
+`restart.py` does.
+
+```sh
+D=/path/to/session L=~/Documents/bbport-mac/deps-x86_64/lib
+BB_CONFIG=$D/bbport.ini BB_FULLSCREEN=0 BB_RETINA=0 BB_OBJECT_MOTION=0 \
+BB_VBLANK_HZ=0 BB_FPS_SCALE=3 BB_STAGING_KEEP_MB=2048 BB_FAULT_WINDOW=1024 \
+BB_VULKAN_LIBRARY=$L/libvulkan.1.dylib SDL_VULKAN_LIBRARY=$L/libvulkan.1.dylib \
+VK_DRIVER_FILES=$L/kosmickrisp/kosmickrisp_mesa_icd.json \
+"$D/DS3 Test.app/Contents/MacOS/bb-probe" $D/out/boot-ds3.bin \
+  --content-profile $D/out/content.bin --app0 /path/to/CUSA03388-app \
+  --user $D/user --patches $D/out/performance-1080p.bin --timeout 0
+```
+
+Private CSVs, logs, and patch files are in `runtime/goal-native-1440p/out/`
+on the test machine; they are not distributed.
 
 ## Recorded observations — October 16, 2026
 

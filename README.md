@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac — The Next Bonfire
-Version:     v1.4.1
+Version:     v1.5.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      3a3c712a67f9b3fa185dde34c6960dbd6b84e22f362fcbd65551f8e1eef305d7
+SHA256:      653e9534bfe50094743602abcf1ed6a55347d3e4d55ba6fb6dc43f3c4515c1f4
 Chain:       solana-mainnet
-Tx:          2PjbTUPZEY1ZJFA4P9mUxTc1SKDApczures2BoTsD91NpJAfzE28rdW2egAQTizfeDfpyxNxR4pwM7ta7sT5QjoX
+Tx:          65DKo3QYEoQg8kNteCWr97Fg8KTbxDbzkpPR8p95hzDSgqdboMcMnfxN7uRUQBJGybRHtTnAScu5z8Red71oi6Lw
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -18,7 +18,7 @@ A follow-up to Celaya Solutions’ Bloodborne-on-Mac work. This time, the road l
 
 Before you touch the code, learn what you are carrying: your own game, a backup you can trust, and evidence that tells you what actually worked. Pick a path. You can change it at any bonfire.
 
-> **Current state:** an early compatibility experiment, with an import adapter, launcher, sixteen local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
+> **Current state:** an early compatibility experiment, with an import adapter, launcher, sixteen local tests, and three learning paths. The recorded October 16 test reached Cemetery of Ash: walking and a sword swing worked, with the overlay near 30 FPS. A tuned October 21 session on an M5 Max played at a median 54 FPS at 1080p; see [measured tuning](#measured-tuning--october-21-2026). This is not a full-game or sustained-performance result. See [requirements and test limits](docs/runtime.md).
 
 ## Choose your path
 
@@ -76,6 +76,18 @@ python3 -m unittest -v
 Use the **Fork** button first if you want to contribute from your own GitHub copy. The [quest](docs/quest.md#vii--read-the-runes) gives you a question before explaining the adapter.
 
 Want to help? Start with [contributing](CONTRIBUTING.md). A small, well-supported correction is a useful first contribution.
+
+## Measured tuning — October 21, 2026
+
+One tuned session on a MacBook Pro (M5 Max, 128 GB): bbport 0.4-v1 source build under Rosetta 2, game shown on an external 1920×1080 60 Hz monitor, frame CSV on. Gameplay frames only (draw count above 500).
+
+| Setup | Median FPS | p10 FPS | Hitches over 50 ms |
+| --- | --- | --- | --- |
+| Native 2560×1440 patch, defaults (20 min) | 39.5 | 28.7 | 845 |
+| 1080p, `BB_STAGING_KEEP_MB=2048`, `BB_FAULT_WINDOW=1024` (3 min) | 53.6 | 42.0 | 13 |
+| Same plus `BB_GPU_QOS=1` and macOS full screen (3 min) | 48.2 | 33.6 | 12 |
+
+The limit is CPU-side emulation work (the GPU command thread near 100% busy, one to two thousand write faults per second), not pixel count; the GPU sat at 24–47%. The two knobs cut streaming stalls and write faults. Thread priority plus full screen made it worse and were reverted. The sessions were short and in one area, so treat these as one machine's numbers, not a benchmark. The exact launch is in the [runtime guide](docs/runtime.md#measured-tuning--october-21-2026).
 
 ## Credits and boundaries
 

@@ -34,9 +34,10 @@ def summarize(rows, hitch_ms=50.0):
     if not rows:
         raise ValueError('No gameplay rows')
     frame_ms = [row['frame_ms'] for row in rows]
-    return {
+    seconds = round(rows[-1]['t_s'] - rows[0]['t_s'], 1)
+    summary = {
         'frames': len(rows),
-        'seconds': round(rows[-1]['t_s'] - rows[0]['t_s'], 1),
+        'seconds': seconds,
         'median_fps': round(1000 / percentile(frame_ms, 50), 1),
         'p10_fps': round(1000 / percentile(frame_ms, 90), 1),
         'p1_fps': round(1000 / percentile(frame_ms, 99), 1),
@@ -45,6 +46,10 @@ def summarize(rows, hitch_ms=50.0):
         'compiles': int(sum(row['compiles'] for row in rows)),
         'image_mb': round(sum(row['image_mb'] for row in rows), 1),
     }
+    # Swapchain presents a second (two a frame with MetalFX frame interpolation), when logged.
+    if all('presented' in row for row in rows) and seconds > 0:
+        summary['presented_fps'] = round(sum(row['presented'] for row in rows) / seconds, 1)
+    return summary
 
 
 def main():

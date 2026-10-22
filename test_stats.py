@@ -42,6 +42,13 @@ class StatsTests(unittest.TestCase):
         result = subprocess.run([sys.executable, 'stats.py', str(short)], capture_output=True, text=True)
         self.assertEqual((result.returncode, result.stderr.strip()), (1, f'Missing column write_fault_ms in {short}'))
 
+    def test_presented_fps_appears_only_with_the_presented_column(self):
+        rows = [(i, 25, 5, 900, 0, 1) for i in range(5)]
+        self.assertNotIn('presented_fps', stats.summarize(stats.gameplay_rows(self.write(rows))))
+        header = 't_s,frame_ms,write_fault_ms,draws,compiles,image_mb,presented\n'
+        doubled = self.write([(*row, 2) for row in rows], header=header, name='doubled.csv')
+        self.assertEqual(stats.summarize(stats.gameplay_rows(doubled))['presented_fps'], 2.5)
+
     def test_cli_prints_one_line_per_key_and_json(self):
         path = self.write([(i, 25, 5, 900, 0, 1) for i in range(4)])
         result = subprocess.run([sys.executable, 'stats.py', str(path)], capture_output=True, text=True)

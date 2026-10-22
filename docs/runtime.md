@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.6.0
+Version:     v1.7.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      4e904970878639bcb12622712a19574a7f859d1532a4d35ab1775c276f83adb4
+SHA256:      e357904f0ed113916862c82022f6139fd666a114486098de143935061c38853e
 Chain:       solana-mainnet
-Tx:          2yBvnkYaMkgTW4bv6wCWmcFo873tFxsnwpYviTEHLP4t3R9bAHh6kpzYumL4AuzKxnJ3b1AsgbJVuUtFRchwjQAR
+Tx:          ias9JN6oN7jAAfGUhgNoncJFVZmps76YPjG17hC1urGTYdZyReUuWbrivBPNvnD6qRtCcnnvrDnuHUVgUeSccjq
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -69,14 +69,39 @@ Duplicate launches are rejected, and changed probe/GPU binaries require a fresh
 prepare a fresh session with the current launcher before using `restart.py`.
 Keep the prepared session and engine in place.
 
-Fresh sessions default to native 1080p, upscaling off, object motion off, and
-live resolution changes off. Frame diagnostics are disabled to avoid their
-counters and per-frame disk writes; add `--frame-stats` to `play.py` for a
-diagnostic run. The shader cache remains enabled. Restarting preserves the
-session's saved settings. These are conservative low-overhead defaults. A
-measured faster setup from October 21 is [below](#measured-tuning--october-21-2026);
-the launchers do not expose its knobs yet. The engine's shadow, LOD, and startup
-resolution patches target Bloodborne and must not be applied to DS3.
+Fresh sessions default to native 1080p with MetalFX temporal anti-aliasing
+(`upscaler=metalfx`, `preset=0`, "Native AA": render and output both 1080p),
+object motion off, and live resolution changes off. Frame diagnostics are
+disabled to avoid their counters and per-frame disk writes; add `--frame-stats`
+to `play.py` for a diagnostic run. Both launchers point KosmicKrisp's shader
+cache at `runtime/cache/mesa` (shared across sessions, 4 GB cap) so repeat
+visits recompile less. Restarting preserves the session's saved settings. The
+engine's shadow, LOD, and startup resolution patches target Bloodborne and must
+not be applied to DS3.
+
+### Tuned launches, overrides, patch files, and statistics
+
+`--tuned` applies the setup measured on October 21
+([below](#measured-tuning--october-21-2026)): `BB_VBLANK_HZ=0`,
+`BB_STAGING_KEEP_MB=2048`, `BB_FAULT_WINDOW=1024`, `BB_RETINA=0`. `--env
+KEY=VALUE` (repeatable) sets one runtime (`BB_*`) or shader-cache (`MESA_*`)
+variable; it is applied after `--tuned`, so `--tuned --env BB_VBLANK_HZ=30`
+keeps the other three. The session's `bbport.ini`, Vulkan library paths, and
+`VK_DRIVER_FILES` always win. Every `BB_*` variable from your shell is still
+dropped. `play.py` records the list in `result.json` (`extra_env`), and
+`restart.py` replays it unless you pass `--tuned` or `--env` again, so a
+Desktop shortcut needs no new flags.
+
+`--patches FILE` copies a BBPATCH2 file you built yourself (bbport's
+`scripts/patches.py` format) into the session's `out/patches.bin`, passes it to
+the probe, and records its hash; `restart.py` passes it again and refuses to
+start if the file changed. This repository never builds or bundles patch files.
+
+`python3 stats.py <session>/out/frames.csv` summarizes a frame CSV from a
+`--frame-stats` run: gameplay rows only (`--min-draws`, default 500), median,
+p10 and p1 FPS, frames over `--hitch-ms` (default 50), median write-fault
+milliseconds, shader compiles, and image upload megabytes; `--json` for
+machines. The October 21 rows in this guide reproduce from it to one decimal.
 
 Keyboard controls: Space confirms; I/J/K/L move through menus; Return is
 Options and skips the opening movie. WASD moves, arrows turn the camera,
@@ -149,9 +174,11 @@ git diff --check
 The tests cover the observed startup failure, library-ID collisions, version
 mismatches, unknown IDs, and preservation of all linked-image bytes outside
 the import names. Launcher tests also cover both runtime layouts, matching
-Metal library paths, copied saves, rejected inputs, FPS scaling, and watchdogs.
-Restart tests cover save backups, repeated progress, separate logs, disabled
-diagnostics, concurrent launches, changed runtimes, and backup failures.
+Metal library paths, copied saves, rejected inputs, FPS scaling, watchdogs,
+`--tuned`/`--env` precedence, and patch files. Restart tests cover save
+backups, repeated progress, separate logs, disabled diagnostics, concurrent
+launches, changed runtimes, replayed overrides, changed patch files, and backup
+failures. `stats.py` has its own tests.
 Runtime logs and saves are ignored by Git.
 
 ## Source-build startup check — October 21, 2026
@@ -193,11 +220,13 @@ become `90 90 90 90` (frame limiter test). The 1440p row also changed
 `80 07 00 00 38 04 00 00` at `0x5ac2ffc` to `00 0a 00 00 a0 05 00 00`
 (render size 1920×1080 to 2560×1440).
 
-`play.py` and `restart.py` replace every `BB_*` variable with their own, so
-this setup was launched by hand from a prepared session folder, with
-`bbport.ini` set to `output_res=1920x1080`, `upscaler=metalfx`, `show_fps=1`,
-from the bbport checkout as the working directory. Back up `user/` first, as
-`restart.py` does.
+At the time, `play.py` and `restart.py` replaced every `BB_*` variable with
+their own, so this setup was launched by hand from a prepared session folder,
+with `bbport.ini` set to `output_res=1920x1080`, `upscaler=metalfx`,
+`show_fps=1`, from the bbport checkout as the working directory. The launchers
+now reproduce it with `--tuned --patches <your file>`
+([above](#tuned-launches-overrides-patch-files-and-statistics)). The hand
+launch stays here as the record of what was measured.
 
 ```sh
 D=/path/to/session L=~/Documents/bbport-mac/deps-x86_64/lib

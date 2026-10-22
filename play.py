@@ -15,7 +15,7 @@ import sys
 from import_adapter import adapt_image
 
 
-DEFAULT_SETTINGS = ('show_fps=1\nupscaler=off\nobject_motion=0\n'
+DEFAULT_SETTINGS = ('show_fps=1\nupscaler=metalfx\npreset=0\nobject_motion=0\n'
                     'output_res=1920x1080\nlive_resolution=0\n')
 # The setup measured on October 21, 2026 (docs/runtime.md): unpaced vblank, a larger staging
 # pool, a wider write-fault window, and no Retina scaling of the window.

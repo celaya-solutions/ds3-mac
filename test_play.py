@@ -91,6 +91,7 @@ class LauncherTests(unittest.TestCase):
                 self.assertNotIn('BB_FRAME_STATS', env)
                 self.assertNotIn('BB_FRAME_LOG', env)
                 self.assertEqual((self.data / 'bbport.ini').read_text(), play.DEFAULT_SETTINGS)
+                self.assertIn('upscaler=metalfx\npreset=0\n', play.DEFAULT_SETTINGS)
                 self.assertFalse({'BB_PATCHES', 'BB_FPS', 'BB_RENDER_RES'} & env.keys())
                 self.assertNotIn('--patches', command)
                 self.assertEqual(command[-2:], ['--timeout', '120'])

@@ -1,12 +1,12 @@
 ```text
 Document:    Dark Souls III on Mac with bbport
-Version:     v1.7.0
+Version:     v1.8.0
 Author:      Celaya Solutions
 Contact:     hello@celayasolutions.com
 Date:        2026-10-21
-SHA256:      e357904f0ed113916862c82022f6139fd666a114486098de143935061c38853e
+SHA256:      11c8c4bab8574d0774ad310735277735446bdcd6c6f4e9590267ff702e470d2f
 Chain:       solana-mainnet
-Tx:          ias9JN6oN7jAAfGUhgNoncJFVZmps76YPjG17hC1urGTYdZyReUuWbrivBPNvnD6qRtCcnnvrDnuHUVgUeSccjq
+Tx:          4xnCYbjbY8z94EzmaBbcSgQDYVgmeDrAVTqXhfcH653aeMTfhHwamvzver9WkZr3tJvUwuKtYwqDDD9YnMjQHGAs
 License:     MIT / CSR (Celaya Solutions)
 ```
 
@@ -241,6 +241,19 @@ VK_DRIVER_FILES=$L/kosmickrisp/kosmickrisp_mesa_icd.json \
 
 Private CSVs, logs, and patch files are in `runtime/goal-native-1440p/out/`
 on the test machine; they are not distributed.
+
+## Guest memory import probe — October 21, 2026
+
+bbport's `tools/host_import_probe.c`, built for macOS (POSIX shared memory in
+place of a memfd, host-pointer import only), run on the M5 Max against
+KosmicKrisp with 512 MiB: `minImportedHostPointerAlignment` 4096; import of the
+shared-memory backing view and of anonymous memory both succeeded in 0.1 ms;
+the GPU read 64 MiB of imported guest memory in 0.41 ms (162.5 GB/s) against
+2.47 ms for today's CPU-copy-to-staging path (1.84 ms of it CPU time); 64 of
+64 coherence rounds saw CPU writes through the other mapping; 2,000 `mprotect`
+calls on the guest view did not slow GPU reads of the imported view. This
+clears the way for guest memory in place on Apple silicon (engine plan, Task 2).
+Private output: `runtime/probe-ext/host-import.txt`.
 
 ## Recorded observations — October 16, 2026
 
